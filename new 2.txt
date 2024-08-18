@@ -1,0 +1,17 @@
+i need a code written by next js "app router" and type script and tailwind css for a web page that enable the user to design a whatsapp template message to be sent to the customer,
+
+the page contains two columns or segments or divs, the left is  for designing the message and represent 40% of the width,
+the right for the whatsapp template message preview
+also need inputs or text boxes to have border
+the message contains five parts. 
+1- header of the message, this is of type text or image or video or document, so the user select the header type then its value
+in case type is image or video or document ,, need to select the file from my pc and be uplodaed to my system, this means i need another page to view all uploaded docs.
+2- message body which is a text of 1024 characters,,
+3- body ending message, text of 100 char 	
+4- message footer, text of length 100 characters
+5-message buttons, user define up to 10 buttons, we have two types of buttons, quick reply or call to action, each button has caption :
+if button type  is call to action, user enter the URL in a text box called direct to URL
+if button type  is quick reply , the action is needed , action is a dropdown of list of values a and b,c,d,e,f
+if user selected c or d  another dropdown should be appear to the user to select action details , action details is another drop down of 5 values x,t,v,dss,ss, name this dropdown "direct o menu"
+
+then the customer press save button to save the template message in a file

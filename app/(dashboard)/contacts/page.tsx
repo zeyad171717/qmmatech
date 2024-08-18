@@ -4,7 +4,7 @@ import { ContactsTable } from "./contacts-table";
 const ContactsPage = () => {
   return (
     <Tabs
-      className="max-w-screen-2xl mx-auto w-full pb-10 -mt-24"
+      className="max-w-screen-2xl mx-auto w-full pb-10 p-6"
       defaultValue="contacts"
     >
       <TabsList className="grid w-full grid-cols-5">

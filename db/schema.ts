@@ -248,6 +248,14 @@ export const messagesRelations = relations(messages, ({ one, many }) => ({
   buttons: many(templateButtons),
 }));
 
+export const bots = pgTable("bots", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").notNull(),
+  name: text("name").notNull(),
+  isArchived: boolean("isArchived").default(false),
+  parentBotId: text("parentBotId"),
+});
+
 export const insertContactSchema = createInsertSchema(contacts);
 export const insertListSchema = createInsertSchema(lists, {
   creationDate: z.coerce.date(),
@@ -255,3 +263,4 @@ export const insertListSchema = createInsertSchema(lists, {
 export const insertCampaignSchema = createInsertSchema(campaigns, {
   creationDate: z.coerce.date(),
 });
+export const insertBotSchema = createInsertSchema(bots);
