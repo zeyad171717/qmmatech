@@ -9,7 +9,7 @@ import { ArchivedListsTable } from "./archived-lists-table";
 const CampaignsPage = () => {
   return (
     <Tabs
-      className="max-w-screen-2xl mx-auto w-full pb-10 -mt-24"
+      className="max-w-screen-2xl mx-auto w-full pb-10 p-6"
       defaultValue="campaigns"
     >
       <TabsList className="grid w-full grid-cols-5">

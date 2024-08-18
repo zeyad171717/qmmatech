@@ -127,6 +127,34 @@
       "when": 1721574107808,
       "tag": "0017_aberrant_alex_power",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "5",
+      "when": 1723625980990,
+      "tag": "0018_ordinary_fallen_one",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "5",
+      "when": 1723639358188,
+      "tag": "0019_white_cannonball",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "5",
+      "when": 1723639548588,
+      "tag": "0020_orange_xorn",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "5",
+      "when": 1723641514684,
+      "tag": "0021_spicy_havok",
+      "breakpoints": true
     }
   ]
 }

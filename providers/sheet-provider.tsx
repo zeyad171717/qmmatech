@@ -11,6 +11,9 @@ import { NewListSheet } from "@/features/lists/components/new-list-sheet";
 import { NewTemplateSheet } from "@/features/templates/components/new-template-sheet";
 import { EditTemplateSheet } from "@/features/templates/components/edit-template-sheet";
 
+import { NewMessageSheet } from "@/features/messages/components/new-message-sheet";
+import { EditMessageSheet } from "@/features/messages/components/edit-message-sheet";
+
 import { useMountedState } from "react-use";
 
 export const SheetProvider = () => {
@@ -32,6 +35,9 @@ export const SheetProvider = () => {
 
       <NewTemplateSheet />
       <EditTemplateSheet />
+
+      <NewMessageSheet />
+      <EditMessageSheet />
     </>
   );
 };

@@ -4,6 +4,8 @@ import contacts from "./contacts";
 import campaigns from "./campaigns";
 import lists from "./lists";
 import templates from "./templates";
+import messages from "./messages";
+import bots from "./bots";
 
 export const runtime = "edge";
 
@@ -14,6 +16,8 @@ const routes = app
   .route("/campaigns", campaigns)
   .route("/lists", lists)
   .route("/templates", templates)
+  .route("/messages", messages)
+  .route("/bots", bots)
 
 export const GET = handle(app);
 export const POST = handle(app);

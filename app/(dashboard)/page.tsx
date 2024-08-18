@@ -1,9 +1,9 @@
-const HomePage = () => {
-  return (
+const Page = () => {
+  return ( 
     <div>
-      Home
+      Page
     </div>
-  );
-};
-
-export default HomePage;
+   );
+}
+ 
+export default Page;
