@@ -2,14 +2,14 @@ import { useQuery } from "@tanstack/react-query";
 
 import { client } from "@/lib/hono";
 
-export const useGetBots = () => {
+export const useGetNodes = (parentBotId: string) => {
   const query = useQuery({
-    queryKey: ["bots"],
+    queryKey: ["nodes", { parentBotId }],
     queryFn: async () => {
-      const response = await client.api.bots.$get();
+      const response = await client.api.nodes.$get({ query: { parentBotId } });
 
       if (!response.ok) {
-        throw new Error("Failed to fetch bots");
+        throw new Error("Failed to fetch nodes");
       }
 
       const { data } = await response.json();

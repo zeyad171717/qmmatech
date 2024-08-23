@@ -6,6 +6,7 @@ import lists from "./lists";
 import templates from "./templates";
 import messages from "./messages";
 import bots from "./bots";
+import nodes from "./nodes";
 
 export const runtime = "edge";
 
@@ -18,6 +19,7 @@ const routes = app
   .route("/templates", templates)
   .route("/messages", messages)
   .route("/bots", bots)
+  .route("/nodes", nodes);
 
 export const GET = handle(app);
 export const POST = handle(app);
