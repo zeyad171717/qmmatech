@@ -252,9 +252,23 @@ export const bots = pgTable("bots", {
   id: text("id").primaryKey(),
   userId: text("user_id").notNull(),
   name: text("name").notNull(),
-  isArchived: boolean("isArchived").default(false),
-  parentBotId: text("parentBotId"),
 });
+export const botsRelations = relations(bots, ({ many }) => ({
+  nodes: many(nodes)
+}))
+
+export const nodes = pgTable("nodes", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").notNull(),
+  name: text("name").notNull(),
+  botId: text("botId").notNull(),
+});
+export const nodesRelations = relations(nodes, ({ one }) => ({
+  bot: one(bots, {
+    fields: [nodes.botId],
+    references: [templateFooters.id],
+  })
+}))
 
 export const insertContactSchema = createInsertSchema(contacts);
 export const insertListSchema = createInsertSchema(lists, {
@@ -264,3 +278,4 @@ export const insertCampaignSchema = createInsertSchema(campaigns, {
   creationDate: z.coerce.date(),
 });
 export const insertBotSchema = createInsertSchema(bots);
+export const insertNodeSchema = createInsertSchema(nodes);

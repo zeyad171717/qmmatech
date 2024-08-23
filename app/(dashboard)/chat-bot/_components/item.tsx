@@ -29,6 +29,7 @@ interface ItemProps {
   label: string;
   onClick?: () => void;
   icon: LucideIcon;
+  onCreate: () => void;
 }
 
 export const Item = ({
@@ -37,14 +38,14 @@ export const Item = ({
   onClick,
   icon: Icon,
   active,
+  level,
   isSearch,
-  level = 0,
   onExpand,
   expanded,
+  onCreate,
 }: ItemProps) => {
   const { user } = useUser();
   const router = useRouter();
-  const create = useCreateBot();
 
   const onArchive = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     event.stopPropagation();
@@ -58,23 +59,11 @@ export const Item = ({
     onExpand?.();
   };
 
-  const onCreate = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+  const handleCreate = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     event.stopPropagation();
     if (!id) return;
 
-    create.mutate(
-      { name: "Untitled" },
-      {
-        // @ts-ignore
-        onSuccess: ({ data }) => {
-          if (!expanded) {
-            onExpand?.();
-          }
-
-          router.push(`/chat-bot/${data.id}`);
-        },
-      }
-    );
+    onCreate();
   };
 
   const ChevronIcon = expanded ? ChevronDown : ChevronRight;
@@ -98,7 +87,7 @@ export const Item = ({
           <ChevronIcon className="h-4 w-4 shrink-0 text-muted-foreground/50" />
         </div>
       )}
-        <Icon className="mr-2 h-[1.125rem] w-[1.125rem] shrink-0 text-muted-foreground" />
+      <Icon className="mr-2 h-[1.125rem] w-[1.125rem] shrink-0 text-muted-foreground" />
 
       <span className="truncate">{label}</span>
       {isSearch && (
@@ -135,7 +124,7 @@ export const Item = ({
           </DropdownMenu>
           <div
             role="button"
-            onClick={onCreate}
+            onClick={handleCreate}
             className="ml-auto h-full rounded-sm opacity-0 hover:bg-neutral-300 group-hover:opacity-100 dark:hover:bg-neutral-600"
           >
             <Plus className="h-4 w-4 text-muted-foreground" />
@@ -148,10 +137,7 @@ export const Item = ({
 
 Item.Skeleton = function ItemSkeleton({ level }: { level?: number }) {
   return (
-    <div
-      style={{ paddingLeft: level ? `${level * 12 + 25}px` : "12px" }}
-      className="flex gap-x-2 py-[.1875rem]"
-    >
+    <div style={{ paddingLeft: "12px" }} className="flex gap-x-2 py-[.1875rem]">
       <Skeleton className="h-4 w-4" />
       <Skeleton className="h-4 w-[30%]" />
     </div>
