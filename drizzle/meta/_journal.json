@@ -162,6 +162,27 @@
       "when": 1724079447521,
       "tag": "0022_tricky_ogun",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "5",
+      "when": 1724437852571,
+      "tag": "0023_wonderful_wolfpack",
+      "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "5",
+      "when": 1724439015056,
+      "tag": "0024_redundant_bastion",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "5",
+      "when": 1724440019953,
+      "tag": "0025_friendly_marten_broadcloak",
+      "breakpoints": true
     }
   ]
 }

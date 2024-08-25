@@ -6,7 +6,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useCreateBot } from "@/features/bots/api/use-create-bot";
 import { cn } from "@/lib/utils";
 import { useUser } from "@clerk/nextjs";
 import {
@@ -23,7 +22,6 @@ interface ItemProps {
   id?: string;
   active?: boolean;
   expanded?: boolean;
-  isSearch?: boolean;
   level?: number;
   onExpand?: () => void;
   label: string;
@@ -39,7 +37,6 @@ export const Item = ({
   icon: Icon,
   active,
   level,
-  isSearch,
   onExpand,
   expanded,
   onCreate,
@@ -59,7 +56,9 @@ export const Item = ({
     onExpand?.();
   };
 
-  const handleCreate = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+  const handleCreate = (
+    event: React.MouseEvent<HTMLDivElement, MouseEvent>
+  ) => {
     event.stopPropagation();
     if (!id) return;
 
@@ -90,38 +89,8 @@ export const Item = ({
       <Icon className="mr-2 h-[1.125rem] w-[1.125rem] shrink-0 text-muted-foreground" />
 
       <span className="truncate">{label}</span>
-      {isSearch && (
-        <kbd className="pointer-events-none ml-auto inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[.625rem] font-medium text-muted-foreground opacity-100 dark:bg-neutral-700">
-          <span className="text-xs">CTRL</span>K
-        </kbd>
-      )}
       {!!id && (
-        <div className="ml-auto flex items-center gap-x-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger onClick={(e) => e.stopPropagation()} asChild>
-              <div
-                role="button"
-                className="ml-auto h-full rounded-sm opacity-0 hover:bg-neutral-300 group-hover:opacity-100 dark:hover:bg-neutral-600"
-              >
-                <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
-              </div>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              className="w-60"
-              align="start"
-              side="right"
-              forceMount
-            >
-              <DropdownMenuItem onClick={onArchive}>
-                <Trash className="mr-2 h-4 w-4" />
-                Delete
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <div className="p-2 text-xs text-muted-foreground">
-                Last edited by: {user?.fullName}
-              </div>
-            </DropdownMenuContent>
-          </DropdownMenu>
+        <div className="ml-auto flex items-center">
           <div
             role="button"
             onClick={handleCreate}

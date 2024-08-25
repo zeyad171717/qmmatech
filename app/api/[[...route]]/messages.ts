@@ -34,26 +34,10 @@ const app = new Hono()
       .select({
         id: messages.id,
         name: messages.name,
-        allowCategoryChange: messages.allowCategoryChange,
-        categoryId: messages.categoryId,
-        category: templateCategories.name,
-        typeId: messages.typeId,
-        type: templateTypes.name,
-        languageId: messages.languageId,
-        language: templateLanguages.name,
         status: messages.status,
         creationDate: messages.creationDate,
       })
       .from(messages)
-      .innerJoin(
-        templateCategories,
-        eq(messages.categoryId, templateCategories.id)
-      )
-      .innerJoin(templateTypes, eq(messages.typeId, templateTypes.id))
-      .innerJoin(
-        templateLanguages,
-        eq(messages.languageId, templateLanguages.id)
-      )
       .where(
         and(
           eq(messages.userId, auth.userId),
@@ -61,69 +45,6 @@ const app = new Hono()
         )
       )
       .orderBy(desc(messages.creationDate));
-
-    return c.json({ data });
-  })
-  .get("/categories", clerkMiddleware(), async (c) => {
-    const auth = getAuth(c);
-
-    if (!auth?.userId) {
-      return c.json(
-        {
-          error: "Unauthorized",
-        },
-        401
-      );
-    }
-
-    const data = await db
-      .select({
-        label: templateCategories.name,
-        value: templateCategories.id,
-      })
-      .from(templateCategories);
-
-    return c.json({ data });
-  })
-  .get("/types", clerkMiddleware(), async (c) => {
-    const auth = getAuth(c);
-
-    if (!auth?.userId) {
-      return c.json(
-        {
-          error: "Unauthorized",
-        },
-        401
-      );
-    }
-
-    const data = await db
-      .select({
-        label: templateTypes.name,
-        value: templateTypes.id,
-      })
-      .from(templateTypes);
-
-    return c.json({ data });
-  })
-  .get("/languages", clerkMiddleware(), async (c) => {
-    const auth = getAuth(c);
-
-    if (!auth?.userId) {
-      return c.json(
-        {
-          error: "Unauthorized",
-        },
-        401
-      );
-    }
-
-    const data = await db
-      .select({
-        label: templateLanguages.name,
-        value: templateLanguages.id,
-      })
-      .from(templateLanguages);
 
     return c.json({ data });
   })
@@ -186,26 +107,10 @@ const app = new Hono()
     .select({
       id: messages.id,
       name: messages.name,
-      allowCategoryChange: messages.allowCategoryChange,
-      categoryId: messages.categoryId,
-      category: templateCategories.name,
-      typeId: messages.typeId,
-      type: templateTypes.name,
-      languageId: messages.languageId,
-      language: templateLanguages.name,
       status: messages.status,
       creationDate: messages.creationDate,
     })
     .from(messages)
-    .innerJoin(
-      templateCategories,
-      eq(messages.categoryId, templateCategories.id)
-    )
-    .innerJoin(templateTypes, eq(messages.typeId, templateTypes.id))
-    .innerJoin(
-      templateLanguages,
-      eq(messages.languageId, templateLanguages.id)
-    )
     .where(
       and(
         eq(messages.userId, auth.userId),
@@ -246,25 +151,13 @@ const app = new Hono()
         .select({
           id: messages.id,
           name: messages.name,
-          allowCategoryChange: messages.allowCategoryChange,
-          categoryId: messages.categoryId,
-          typeId: messages.typeId,
-          languageId: messages.languageId,
           status: messages.status,
           headerId: messages.headerId,
           bodyMessage: messages.bodyMessage,
+          bodyEnding: messages.bodyEnding,
           footerId: messages.footerId,
         })
         .from(messages)
-        .innerJoin(
-          templateCategories,
-          eq(messages.categoryId, templateCategories.id)
-        )
-        .innerJoin(templateTypes, eq(messages.typeId, templateTypes.id))
-        .innerJoin(
-          templateLanguages,
-          eq(messages.languageId, templateLanguages.id)
-        )
         .where(and(eq(messages.userId, auth.userId), eq(messages.id, id)));
 
       if (!data) {
@@ -286,11 +179,8 @@ const app = new Hono()
       "json",
       z.object({
         name: z.string(),
-        allowCategoryChange: z.boolean(),
-        categoryId: z.string(),
-        typeId: z.string(),
-        languageId: z.string(),
         bodyMessage: z.string(),
+        bodyEnding: z.string().optional(),
         header: z.boolean(),
         headerTypeId: z.string().optional(),
         headerText: z.string().optional(),
@@ -352,11 +242,8 @@ const app = new Hono()
           id: createId(),
           userId: auth.userId,
           name: values.name,
-          allowCategoryChange: values.allowCategoryChange,
           bodyMessage: values.bodyMessage,
-          categoryId: values.categoryId,
-          typeId: values.typeId,
-          languageId: values.languageId,
+          bodyEnding: values.bodyEnding,
           headerId,
           footerId,
           status: "Running",
@@ -423,11 +310,8 @@ const app = new Hono()
       "json",
       z.object({
         name: z.string(),
-        allowCategoryChange: z.boolean(),
-        categoryId: z.string(),
-        typeId: z.string(),
-        languageId: z.string(),
         bodyMessage: z.string(),
+        bodyEnding: z.string().optional(),
         header: z.boolean(),
         headerTypeId: z.string().optional(),
         headerText: z.string().optional(),
@@ -500,12 +384,9 @@ const app = new Hono()
         .with(templatesToUpdate)
         .update(messages)
         .set({
-          allowCategoryChange: values.allowCategoryChange,
           name: values.name,
-          categoryId: values.categoryId,
-          languageId: values.languageId,
-          typeId: values.typeId,
           bodyMessage: values.bodyMessage,
+          bodyEnding: values.bodyEnding,
           headerId,
           footerId,
         })
@@ -670,15 +551,6 @@ const app = new Hono()
         db
           .select({ id: messages.id })
           .from(messages)
-          .innerJoin(
-            templateCategories,
-            eq(messages.categoryId, templateCategories.id)
-          )
-          .innerJoin(templateTypes, eq(messages.typeId, templateTypes.id))
-          .innerJoin(
-            templateLanguages,
-            eq(messages.languageId, templateLanguages.id)
-          )
           .where(and(eq(messages.id, id), eq(messages.userId, auth.userId)))
       );
 

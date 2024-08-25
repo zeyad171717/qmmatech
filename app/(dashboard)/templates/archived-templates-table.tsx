@@ -5,9 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, Plus } from "lucide-react";
 import { DataTable } from "@/components/data-table";
 import { Skeleton } from "@/components/ui/skeleton";
-import { columns } from "./columns";
 import { useBulkDeleteTemplates } from "@/features/templates/api/use-bulk-delete-templates";
 import { useGetArchivedTemplates } from "@/features/templates/api/use-get-archived-templates";
+import { columns } from "./archived-templates-columns";
 
 export const ArchivedTemplatesTable = () => {
   const deleteTemplates = useBulkDeleteTemplates();
