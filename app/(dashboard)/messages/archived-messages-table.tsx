@@ -5,9 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, Plus } from "lucide-react";
 import { DataTable } from "@/components/data-table";
 import { Skeleton } from "@/components/ui/skeleton";
-import { columns } from "./columns";
 import { useBulkDeleteMessages } from "@/features/messages/api/use-bulk-delete-messages";
 import { useGetArchivedMessages } from "@/features/messages/api/use-get-archived-messages";
+import { columns } from "./archived-messages-columns";
 
 export const ArchivedMessagesTable = () => {
   const deleteMessages = useBulkDeleteMessages();

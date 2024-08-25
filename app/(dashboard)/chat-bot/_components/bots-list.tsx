@@ -64,7 +64,7 @@ export const BotsList = () => {
           expanded && "last:block"
         )}
       >
-        No nodes inside
+        No bots
       </p>
       {bots?.map((bot) => (
         <div key={bot.id}>

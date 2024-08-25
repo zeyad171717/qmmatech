@@ -211,12 +211,9 @@ export const messages = pgTable("messages", {
   id: text("id").primaryKey(),
   userId: text("user_id").notNull(),
   name: text("name").notNull(),
-  allowCategoryChange: boolean("allowCategoryChange").notNull(),
-  categoryId: text("categoryId").notNull(),
-  typeId: text("typeId").notNull(),
-  languageId: text("languageId").notNull(),
   headerId: text("headerId"),
   bodyMessage: text("bodyMessage").notNull(),
+  bodyEnding: text("bodyEnding"),
   footerId: text("footerId"),
   status: text("status").default("Pending"),
   recordStatus: text("record_status").default("created"),
@@ -225,18 +222,6 @@ export const messages = pgTable("messages", {
     .defaultNow(),
 });
 export const messagesRelations = relations(messages, ({ one, many }) => ({
-  category: one(templateCategories, {
-    fields: [messages.categoryId],
-    references: [templateCategories.id],
-  }),
-  type: one(templateTypes, {
-    fields: [messages.typeId],
-    references: [templateTypes.id],
-  }),
-  language: one(templateLanguages, {
-    fields: [messages.languageId],
-    references: [templateLanguages.id],
-  }),
   header: one(templateHeaders, {
     fields: [messages.headerId],
     references: [templateHeaders.id],
@@ -266,7 +251,7 @@ export const nodes = pgTable("nodes", {
 export const nodesRelations = relations(nodes, ({ one }) => ({
   bot: one(bots, {
     fields: [nodes.botId],
-    references: [templateFooters.id],
+    references: [bots.id],
   })
 }))
 
