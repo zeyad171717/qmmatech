@@ -104,20 +104,20 @@ const app = new Hono()
     }
 
     const data = await db
-    .select({
-      id: messages.id,
-      name: messages.name,
-      status: messages.status,
-      creationDate: messages.creationDate,
-    })
-    .from(messages)
-    .where(
-      and(
-        eq(messages.userId, auth.userId),
-        eq(messages.recordStatus, "archived")
+      .select({
+        id: messages.id,
+        name: messages.name,
+        status: messages.status,
+        creationDate: messages.creationDate,
+      })
+      .from(messages)
+      .where(
+        and(
+          eq(messages.userId, auth.userId),
+          eq(messages.recordStatus, "archived")
+        )
       )
-    )
-    .orderBy(desc(messages.creationDate));
+      .orderBy(desc(messages.creationDate));
 
     return c.json({ data });
   })
@@ -152,10 +152,13 @@ const app = new Hono()
           id: messages.id,
           name: messages.name,
           status: messages.status,
-          headerId: messages.headerId,
           bodyMessage: messages.bodyMessage,
           bodyEnding: messages.bodyEnding,
-          footerId: messages.footerId,
+          header: messages.header,
+          headerType: messages.headerType,
+          headerText: messages.headerText,
+          footer: messages.footer,
+          footerText: messages.footerText,
         })
         .from(messages)
         .where(and(eq(messages.userId, auth.userId), eq(messages.id, id)));
@@ -182,7 +185,7 @@ const app = new Hono()
         bodyMessage: z.string(),
         bodyEnding: z.string().optional(),
         header: z.boolean(),
-        headerTypeId: z.string().optional(),
+        headerType: z.string().optional(),
         headerText: z.string().optional(),
         footer: z.boolean(),
         footerText: z.string().optional(),
@@ -201,41 +204,6 @@ const app = new Hono()
         );
       }
 
-      let headerId: any;
-      let footerId: any;
-
-      if (values.header === true) {
-        await db
-          .insert(templateHeaders)
-          // @ts-ignore
-          .values({
-            id: createId(),
-            typeId: values.headerTypeId,
-            text: values.headerText,
-          })
-          .returning()
-          .then((res) => {
-            headerId = res[0].id;
-          });
-      } else {
-        headerId = null;
-      }
-      if (values.footer === true) {
-        footerId = await db
-          .insert(templateFooters)
-          // @ts-ignore
-          .values({
-            id: createId(),
-            text: values.footerText,
-          })
-          .returning()
-          .then((res) => {
-            footerId = res[0].id;
-          });
-      } else {
-        footerId = null;
-      }
-
       const [data] = await db
         .insert(messages)
         .values({
@@ -244,8 +212,11 @@ const app = new Hono()
           name: values.name,
           bodyMessage: values.bodyMessage,
           bodyEnding: values.bodyEnding,
-          headerId,
-          footerId,
+          header: values.header,
+          headerType: values.headerType,
+          headerText: values.headerText,
+          footer: values.footer,
+          footerText: values.footerText,
           status: "Running",
           recordStatus: "created",
         })
@@ -292,9 +263,7 @@ const app = new Hono()
         .with(templatesToDelete)
         .update(messages)
         .set({ recordStatus: "deleted" })
-        .where(
-          inArray(messages.id, sql`(select id from ${templatesToDelete})`)
-        )
+        .where(inArray(messages.id, sql`(select id from ${templatesToDelete})`))
         .returning({
           id: messages.id,
         });
@@ -313,7 +282,7 @@ const app = new Hono()
         bodyMessage: z.string(),
         bodyEnding: z.string().optional(),
         header: z.boolean(),
-        headerTypeId: z.string().optional(),
+        headerType: z.string().optional(),
         headerText: z.string().optional(),
         footer: z.boolean(),
         footerText: z.string().optional(),
@@ -342,37 +311,6 @@ const app = new Hono()
         );
       }
 
-      let headerId: any;
-      let footerId: any;
-
-      if (values.header === true) {
-        await db
-          .update(templateHeaders)
-          .set({
-            typeId: values.headerTypeId,
-            text: values.headerText,
-          })
-          .returning()
-          .then((res) => {
-            headerId = res[0].id;
-          });
-      } else {
-        headerId = null;
-      }
-      if (values.footer === true) {
-        footerId = await db
-          .update(templateFooters)
-          .set({
-            text: values.footerText,
-          })
-          .returning()
-          .then((res) => {
-            footerId = res[0].id;
-          });
-      } else {
-        footerId = null;
-      }
-
       const templatesToUpdate = db.$with("templates_to_update").as(
         db
           .select({ id: messages.id })
@@ -387,12 +325,13 @@ const app = new Hono()
           name: values.name,
           bodyMessage: values.bodyMessage,
           bodyEnding: values.bodyEnding,
-          headerId,
-          footerId,
+          header: values.header,
+          headerType: values.headerType,
+          headerText: values.headerText,
+          footer: values.footer,
+          footerText: values.footerText,
         })
-        .where(
-          inArray(messages.id, sql`(select id from ${templatesToUpdate})`)
-        )
+        .where(inArray(messages.id, sql`(select id from ${templatesToUpdate})`))
         .returning({
           id: messages.id,
         });
@@ -446,9 +385,7 @@ const app = new Hono()
         .with(templatesToDelete)
         .update(messages)
         .set({ recordStatus: "deleted" })
-        .where(
-          inArray(messages.id, sql`(select id from ${templatesToDelete})`)
-        )
+        .where(inArray(messages.id, sql`(select id from ${templatesToDelete})`))
         .returning({
           id: messages.id,
         });

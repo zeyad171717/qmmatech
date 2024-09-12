@@ -8,18 +8,35 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { useUser } from "@clerk/nextjs";
+import { useState } from "react";
 import {
   ChevronDown,
   ChevronRight,
   LucideIcon,
   MoreHorizontal,
+  Pencil,
   Plus,
   Trash,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { useEditBot } from "@/features/bots/api/use-edit-bot";
+import { useEditNode } from "@/features/nodes/api/use-edit-node";
 
 interface ItemProps {
-  id?: string;
+  id: string;
   active?: boolean;
   expanded?: boolean;
   level?: number;
@@ -28,6 +45,7 @@ interface ItemProps {
   onClick?: () => void;
   icon: LucideIcon;
   onCreate: () => void;
+  isBot?: boolean;
 }
 
 export const Item = ({
@@ -40,13 +58,30 @@ export const Item = ({
   onExpand,
   expanded,
   onCreate,
+  isBot = false,
 }: ItemProps) => {
   const { user } = useUser();
   const router = useRouter();
+  const [name, setName] = useState(label);
+  const [open, setOpen] = useState(false);
 
-  const onArchive = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+  const editBot = useEditBot(id);
+  const editNode = useEditNode(id);
+
+  const handleEdit = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
     event.stopPropagation();
     if (!id) return;
+
+    if (isBot) {
+      editBot.mutate({ name });
+    } else {
+      editNode.mutate({ name });
+    }
+
+    setName("");
+    setOpen(false);
   };
 
   const handleExpand = (
@@ -91,6 +126,69 @@ export const Item = ({
       <span className="truncate">{label}</span>
       {!!id && (
         <div className="ml-auto flex items-center">
+          <Dialog onOpenChange={setOpen} open={open}>
+            <DropdownMenu>
+              <DropdownMenuTrigger onClick={(e) => e.stopPropagation()} asChild>
+                <div
+                  role="button"
+                  className="ml-auto h-full rounded-sm opacity-0 hover:bg-neutral-300 group-hover:opacity-100 dark:hover:bg-neutral-600"
+                >
+                  <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                className="w-60"
+                align="start"
+                side="right"
+                forceMount
+              >
+                <DropdownMenuItem>
+                  <DialogTrigger
+                    className="flex flex-row items-center"
+                    asChild
+                    onClick={() => setName(label)}
+                  >
+                    <div className="w-full">
+                      <Pencil className="mr-2 h-4 w-4" />
+                      Edit
+                    </div>
+                  </DialogTrigger>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Edit</DialogTitle>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="name" className="text-right">
+                    Name
+                  </Label>
+                  <Input
+                    id="name"
+                    value={name}
+                    defaultValue={label}
+                    className="col-span-3"
+                    onChange={(e) => {
+                      setName(e.target.value);
+                    }}
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button type="button" variant="secondary">
+                    Close
+                  </Button>
+                </DialogClose>
+                <Button type="submit" onClick={handleEdit}>
+                  Save changes
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
           <div
             role="button"
             onClick={handleCreate}

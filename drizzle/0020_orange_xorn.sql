@@ -1,1 +1,0 @@
-ALTER TABLE "nodes" ADD COLUMN "bot_id" text NOT NULL;

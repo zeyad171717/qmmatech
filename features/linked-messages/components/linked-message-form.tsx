@@ -1,0 +1,321 @@
+"use client";
+
+import { z } from "zod";
+
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { useEffect, useMemo, useState } from "react";
+import { Label } from "@/components/ui/label";
+import { Pencil, Trash } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Select as CustomSelect } from "@/components/select";
+import { RadioGroupItem, RadioGroup } from "@/components/ui/radio-group";
+import { DatePicker } from "@/components/date-picker";
+import { DateTimePicker } from "@/components/ui/date-time-picker";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Combobox } from "@/components/ui/combobox";
+import { Textarea } from "@/components/ui/textarea";
+
+const formSchema = z.object({
+  name: z.string(),
+  bodyMessage: z.string(),
+  bodyEnding: z.string().optional(),
+  header: z.boolean().default(false),
+  headerType: z.string().optional(),
+  headerText: z.string().optional(),
+  footer: z.boolean().default(false),
+  footerText: z.string().optional(),
+  buttonsAvailable: z.boolean().default(false),
+  position: z.string(),
+});
+
+type FormValues = z.infer<typeof formSchema>;
+
+type Props = {
+  defaultValues?: FormValues;
+  onSubmit: (values: FormValues) => void;
+  disabled?: boolean;
+  headerOptions: { label: string; value: string }[];
+  buttonOptions: { label: string; value: string }[];
+  onDelete?: (id: string) => void;
+  id?: string;
+};
+
+export const LinkedMessageForm = ({
+  defaultValues,
+  onSubmit,
+  disabled,
+  headerOptions,
+  buttonOptions,
+  onDelete,
+  id,
+}: Props) => {
+  const [headerType, setHeaderType] = useState<string | undefined>(undefined);
+  const [headerTypeId, setHeaderTypeId] = useState<string | undefined>(
+    undefined
+  );
+  const [header, setHeader] = useState<boolean>(false);
+  const [footer, setFooter] = useState<boolean>(false);
+  const [buttonsAvailable, setButtonsAvailable] = useState<boolean>(false);
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: defaultValues,
+  });
+  const { isSubmitting, isValid } = form.formState;
+
+  const handleSubmit = (values: FormValues) => {
+    onSubmit(values);
+  };
+
+  const handleDelete = () => {
+    // @ts-ignore
+    onDelete?.(id);
+  };
+
+  return (
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(handleSubmit)}
+        className="space-y-4 pt-4"
+      >
+        <FormField
+          name="name"
+          control={form.control}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Name</FormLabel>
+              <FormControl>
+                <Input
+                  disabled={isSubmitting || disabled}
+                  placeholder="Enter message name"
+                  {...field}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+        <FormField
+          name="position"
+          control={form.control}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Position</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a position" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="before">Before</SelectItem>
+                  <SelectItem value="after">After</SelectItem>
+                </SelectContent>
+              </Select>
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="header"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 w-full">
+              <FormControl>
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={(checked) => {
+                    field.onChange(checked);
+                    // @ts-ignore
+                    setHeader(checked);
+                  }}
+                  disabled={isSubmitting || disabled}
+                />
+              </FormControl>
+              <div className="space-y-1 leading-none">
+                <FormDescription>Header</FormDescription>
+              </div>
+            </FormItem>
+          )}
+        />
+        {header === true && (
+          <div className="space-y-2">
+            <FormField
+              control={form.control}
+              name="headerType"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Header type</FormLabel>
+                  <FormControl>
+                    <Combobox
+                      options={headerOptions}
+                      value={headerTypeId}
+                      onChange={(value?: string) => {
+                        const headerOption = headerOptions.find(
+                          (option) => option.value === value
+                        );
+
+                        field.onChange(headerOption?.label);
+
+                        if (value) {
+                          setHeaderType(headerOption?.label);
+                          setHeaderTypeId(value);
+                        } else {
+                          setHeaderType(undefined);
+                          setHeaderTypeId(undefined);
+                        }
+                      }}
+                      disabled={isSubmitting || disabled}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            {headerType === "Text" && (
+              <FormField
+                name="headerText"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Header Text</FormLabel>
+                    <FormControl>
+                      <Input
+                        disabled={isSubmitting || disabled}
+                        placeholder="Enter header text"
+                        {...field}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            )}
+          </div>
+        )}
+        <FormField
+          name="bodyMessage"
+          control={form.control}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Body message</FormLabel>
+              <FormControl>
+                <Textarea
+                  disabled={isSubmitting || disabled}
+                  placeholder="Enter message body message"
+                  {...field}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+        <FormField
+          name="bodyEnding"
+          control={form.control}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Body ending</FormLabel>
+              <FormControl>
+                <Input
+                  disabled={isSubmitting || disabled}
+                  placeholder="Enter message body ending"
+                  {...field}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="footer"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 w-full">
+              <FormControl>
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={(checked) => {
+                    field.onChange(checked);
+                    // @ts-ignore
+                    setFooter(checked);
+                  }}
+                  disabled={isSubmitting || disabled}
+                />
+              </FormControl>
+              <div className="space-y-1 leading-none">
+                <FormDescription>Footer</FormDescription>
+              </div>
+            </FormItem>
+          )}
+        />
+        {footer === true && (
+          <FormField
+            name="footerText"
+            control={form.control}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Footer text</FormLabel>
+                <FormControl>
+                  <Input
+                    disabled={isSubmitting || disabled}
+                    placeholder="Enter footer text"
+                    {...field}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+        )}
+        <FormField
+          control={form.control}
+          name="buttonsAvailable"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 w-full">
+              <FormControl>
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={(checked) => {
+                    field.onChange(checked);
+                    // @ts-ignore
+                    setButtonsAvailable(checked);
+                  }}
+                  disabled={isSubmitting || disabled}
+                />
+              </FormControl>
+              <div className="space-y-1 leading-none">
+                <FormDescription>Buttons</FormDescription>
+              </div>
+            </FormItem>
+          )}
+        />
+
+        <Button className="w-full" disabled={disabled}>
+          {id ? "Save changes" : "Create Message"}
+        </Button>
+        {!!id && (
+          <Button
+            type="button"
+            disabled={disabled}
+            onClick={handleDelete}
+            className="w-full"
+            variant="outline"
+          >
+            <Trash className="size-4 mr-2" />
+            Delete Message
+          </Button>
+        )}
+      </form>
+    </Form>
+  );
+};

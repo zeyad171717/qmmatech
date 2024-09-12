@@ -1,1 +1,0 @@
-ALTER TABLE "templates" ADD COLUMN "user_id" text NOT NULL;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
 
 import { cn } from "@/lib/utils";
 
@@ -9,6 +9,10 @@ import { Item } from "./item";
 
 import { Bot } from "lucide-react";
 import { useGetNodes } from "@/features/nodes/api/use-get-nodes";
+import { useEditNode } from "@/features/nodes/api/use-edit-node";
+import { SubNodesList } from "./sub-nodes-list";
+import { useCreateNode } from "@/features/nodes/api/use-create-node";
+import { Droppable, Draggable } from "@hello-pangea/dnd";
 
 export const NodesList = ({
   parentBotId,
@@ -20,6 +24,8 @@ export const NodesList = ({
   const params = useParams();
   const router = useRouter();
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+
+  const create = useCreateNode();
 
   const nodesQuery = useGetNodes(parentBotId);
   const nodes = nodesQuery.data;
@@ -35,18 +41,20 @@ export const NodesList = ({
     router.push(`/chat-bot/${parentBotId}/${nodeId}`);
   };
 
-  if (nodes === undefined) {
-    return (
-      <>
-        <Item.Skeleton />
-        {level === 0 && (
-          <>
-            <Item.Skeleton />
-            <Item.Skeleton />
-          </>
-        )}
-      </>
+  const onCreate = (nodeId: string) => {
+    create.mutate(
+      { name: "Untitled", parentId: nodeId, botId: parentBotId },
+      {
+        // @ts-ignore
+        onSuccess: ({ data }) => {
+          router.push(`/chat-bot/${parentBotId}/${data.id}`);
+        },
+      }
     );
+  };
+
+  if (nodesQuery.isLoading) {
+    return <Item.Skeleton />;
   }
 
   return (
@@ -71,9 +79,15 @@ export const NodesList = ({
             active={params.nodeId === node.id}
             onExpand={() => onExpand(node.id)}
             expanded={expanded[node.id]}
-            onCreate={() => {}}
+            onCreate={() => onCreate(node.id)}
           />
-          {expanded[node.id] && "Nodes"}
+          {expanded[node.id] && (
+            <SubNodesList
+              parentId={node.id}
+              level={level + 1}
+              botId={parentBotId}
+            />
+          )}
         </div>
       ))}
     </>

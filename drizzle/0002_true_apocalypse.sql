@@ -1,0 +1,1 @@
+ALTER TABLE "linkedMessages" DROP COLUMN IF EXISTS "position";
