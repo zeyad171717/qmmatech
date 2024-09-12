@@ -25,7 +25,8 @@ const routes = app
   .route("/interactiveWords", interactiveWords)
   .route("/errorMessages", errorMessages)
   .route("/bots", bots)
-  .route("/nodes", nodes);
+  .route("/nodes", nodes)
+  .route("/alerts", alerts)
 
 export const GET = handle(app);
 export const POST = handle(app);

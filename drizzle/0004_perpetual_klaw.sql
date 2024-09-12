@@ -1,1 +1,0 @@
-ALTER TABLE "interactiveWords" ADD COLUMN "activated" boolean DEFAULT true;

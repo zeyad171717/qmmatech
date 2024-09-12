@@ -1,3 +1,15 @@
+CREATE TABLE IF NOT EXISTS "alerts" (
+	"id" text PRIMARY KEY NOT NULL,
+	"user_id" text NOT NULL,
+	"status_code" text NOT NULL,
+	"name" text NOT NULL,
+	"time" text NOT NULL,
+	"scheduled" text,
+	"to" text NOT NULL,
+	"templateId" text NOT NULL,
+	"active" boolean DEFAULT true
+);
+--> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "bots" (
 	"id" text PRIMARY KEY NOT NULL,
 	"user_id" text NOT NULL,
@@ -74,6 +86,7 @@ CREATE TABLE IF NOT EXISTS "linkedMessages" (
 	"creation_date" timestamp DEFAULT now() NOT NULL,
 	"nodeId" text,
 	"botId" text,
+	"activated" boolean DEFAULT true,
 	"position" text NOT NULL
 );
 --> statement-breakpoint

@@ -5,36 +5,8 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1726068395122,
-      "tag": "0000_hard_blur",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1726068584158,
-      "tag": "0001_old_prism",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1726068729646,
-      "tag": "0002_true_apocalypse",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "5",
-      "when": 1726068806315,
-      "tag": "0003_thick_xorn",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "5",
-      "when": 1726070424624,
-      "tag": "0004_perpetual_klaw",
+      "when": 1726136530897,
+      "tag": "0000_robust_ultimatum",
       "breakpoints": true
     }
   ]
