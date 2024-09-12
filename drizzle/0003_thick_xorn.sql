@@ -1,1 +1,0 @@
-ALTER TABLE "linkedMessages" ADD COLUMN "position" text NOT NULL;

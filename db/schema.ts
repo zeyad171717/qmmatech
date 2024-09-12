@@ -374,6 +374,24 @@ export const nodesRelations = relations(nodes, ({ one, many }) => ({
   linkedMessages: many(linkedMessages),
 }));
 
+export const alerts = pgTable("alerts", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").notNull(),
+  statusCode: text("status_code").notNull(),
+  name: text("name").notNull(),
+  time: text("time").notNull(),
+  scheduled: text("scheduled"),
+  to: text("to").notNull(),
+  templateId: text("templateId").notNull(),
+  active: boolean("active").default(true),
+});
+export const alertsRelations = relations(alerts, ({ one, many }) => ({
+  template: one(templates, {
+    fields: [alerts.templateId],
+    references: [templates.id],
+  }),
+}));
+
 export const insertContactSchema = createInsertSchema(contacts);
 export const insertListSchema = createInsertSchema(lists, {
   creationDate: z.coerce.date(),
