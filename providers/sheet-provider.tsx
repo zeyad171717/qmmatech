@@ -14,7 +14,12 @@ import { EditTemplateSheet } from "@/features/templates/components/edit-template
 import { NewMessageSheet } from "@/features/messages/components/new-message-sheet";
 import { EditMessageSheet } from "@/features/messages/components/edit-message-sheet";
 
+import { NewLinkedMessageSheet } from "@/features/linked-messages/components/new-linked-message-sheet";
+import { EditLinkedMessageSheet } from "@/features/linked-messages/components/edit-linked-message-sheet";
+
 import { useMountedState } from "react-use";
+import { NewInteractiveWordSheet } from "@/features/interactive-words/components/new-interactive-word-sheet";
+import { EditInteractiveWordSheet } from "@/features/interactive-words/components/edit-interactive-word-sheet";
 
 export const SheetProvider = () => {
   const isMounted = useMountedState();
@@ -38,6 +43,12 @@ export const SheetProvider = () => {
 
       <NewMessageSheet />
       <EditMessageSheet />
+
+      <NewLinkedMessageSheet />
+      <EditLinkedMessageSheet />
+
+      <NewInteractiveWordSheet />
+      <EditInteractiveWordSheet />
     </>
   );
 };

@@ -4,6 +4,7 @@ import {
   integer,
   pgTable,
   primaryKey,
+  serial,
   text,
   timestamp,
 } from "drizzle-orm/pg-core";
@@ -211,10 +212,13 @@ export const messages = pgTable("messages", {
   id: text("id").primaryKey(),
   userId: text("user_id").notNull(),
   name: text("name").notNull(),
-  headerId: text("headerId"),
   bodyMessage: text("bodyMessage").notNull(),
   bodyEnding: text("bodyEnding"),
-  footerId: text("footerId"),
+  header: boolean("header").notNull(),
+  headerType: text("headerType"),
+  headerText: text("headerText"),
+  footer: boolean("footer").notNull(),
+  footerText: text("footerText"),
   status: text("status").default("Pending"),
   recordStatus: text("record_status").default("created"),
   creationDate: timestamp("creation_date", { mode: "date" })
@@ -222,38 +226,153 @@ export const messages = pgTable("messages", {
     .defaultNow(),
 });
 export const messagesRelations = relations(messages, ({ one, many }) => ({
-  header: one(templateHeaders, {
-    fields: [messages.headerId],
-    references: [templateHeaders.id],
-  }),
-  footer: one(templateFooters, {
-    fields: [messages.footerId],
-    references: [templateFooters.id],
-  }),
   buttons: many(templateButtons),
+  node: one(nodes),
+  bot: one(bots),
 }));
+
+export const errorMessages = pgTable("errorMessages", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").notNull(),
+  name: text("name").notNull(),
+  bodyMessage: text("bodyMessage").notNull(),
+  bodyEnding: text("bodyEnding"),
+  header: boolean("header").notNull(),
+  headerType: text("headerType"),
+  headerText: text("headerText"),
+  footer: boolean("footer").notNull(),
+  footerText: text("footerText"),
+  status: text("status").default("Pending"),
+  recordStatus: text("record_status").default("created"),
+  creationDate: timestamp("creation_date", { mode: "date" })
+    .notNull()
+    .defaultNow(),
+});
+export const errorMessagesRelations = relations(
+  errorMessages,
+  ({ one, many }) => ({
+    buttons: many(templateButtons),
+    node: one(nodes),
+    bot: one(bots),
+  })
+);
+
+export const linkedMessages = pgTable("linkedMessages", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").notNull(),
+  name: text("name").notNull(),
+  bodyMessage: text("bodyMessage").notNull(),
+  bodyEnding: text("bodyEnding"),
+  header: boolean("header").notNull(),
+  headerType: text("headerType"),
+  headerText: text("headerText"),
+  footer: boolean("footer").notNull(),
+  footerText: text("footerText"),
+  status: text("status").default("Pending"),
+  recordStatus: text("record_status").default("created"),
+  creationDate: timestamp("creation_date", { mode: "date" })
+    .notNull()
+    .defaultNow(),
+  nodeId: text("nodeId"),
+  botId: text("botId"),
+  activated: boolean("activated").default(true),
+  position: text("position").notNull(),
+});
+export const linkedMessagesRelations = relations(
+  linkedMessages,
+  ({ one, many }) => ({
+    buttons: many(templateButtons),
+    node: one(nodes, {
+      fields: [linkedMessages.nodeId],
+      references: [nodes.id],
+    }),
+    bot: one(bots, {
+      fields: [linkedMessages.botId],
+      references: [bots.id],
+    }),
+  })
+);
+
+export const interactiveWords = pgTable("interactiveWords", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").notNull(),
+  word: text("word").notNull(),
+  filter: text("filter").notNull(),
+  status: text("status").default("Pending"),
+  recordStatus: text("record_status").default("created"),
+  creationDate: timestamp("creation_date", { mode: "date" })
+    .notNull()
+    .defaultNow(),
+  nodeId: text("nodeId"),
+  botId: text("botId"),
+  messageId: text("messageId").notNull(),
+});
+export const interactiveWordsRelations = relations(
+  interactiveWords,
+  ({ one }) => ({
+    node: one(nodes, {
+      fields: [interactiveWords.nodeId],
+      references: [nodes.id],
+    }),
+    bot: one(bots, {
+      fields: [interactiveWords.botId],
+      references: [bots.id],
+    }),
+    message: one(messages, {
+      fields: [interactiveWords.messageId],
+      references: [messages.id],
+    }),
+  })
+);
 
 export const bots = pgTable("bots", {
   id: text("id").primaryKey(),
   userId: text("user_id").notNull(),
   name: text("name").notNull(),
+  messageId: text("messageId").notNull(),
+  errorMessageId: text("errorMessageId").notNull(),
 });
-export const botsRelations = relations(bots, ({ many }) => ({
-  nodes: many(nodes)
-}))
+export const botsRelations = relations(bots, ({ many, one }) => ({
+  nodes: many(nodes),
+  message: one(messages, {
+    fields: [bots.messageId],
+    references: [messages.id],
+  }),
+  errorMessage: one(errorMessages, {
+    fields: [bots.errorMessageId],
+    references: [errorMessages.id],
+  }),
+}));
 
 export const nodes = pgTable("nodes", {
   id: text("id").primaryKey(),
   userId: text("user_id").notNull(),
   name: text("name").notNull(),
   botId: text("botId").notNull(),
+  messageId: text("messageId").notNull(),
+  errorMessageId: text("errorMessageId").notNull(),
+  parentId: text("parentId"),
+  index: integer("index"),
 });
-export const nodesRelations = relations(nodes, ({ one }) => ({
+export const nodesRelations = relations(nodes, ({ one, many }) => ({
   bot: one(bots, {
     fields: [nodes.botId],
     references: [bots.id],
-  })
-}))
+  }),
+  message: one(messages, {
+    fields: [nodes.messageId],
+    references: [messages.id],
+  }),
+  errorMessage: one(errorMessages, {
+    fields: [nodes.errorMessageId],
+    references: [errorMessages.id],
+  }),
+  parent: one(nodes, {
+    fields: [nodes.parentId],
+    references: [nodes.id],
+  }),
+  linkedMessages: many(linkedMessages),
+}));
 
 export const insertContactSchema = createInsertSchema(contacts);
 export const insertListSchema = createInsertSchema(lists, {

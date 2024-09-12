@@ -1,0 +1,1 @@
+ALTER TABLE "linkedMessages" ADD COLUMN "activated" boolean DEFAULT true;

@@ -5,6 +5,9 @@ import campaigns from "./campaigns";
 import lists from "./lists";
 import templates from "./templates";
 import messages from "./messages";
+import errorMessages from "./error-messages";
+import linkedMessages from "./linked-messages";
+import interactiveWords from "./interactive-words";
 import bots from "./bots";
 import nodes from "./nodes";
 
@@ -18,6 +21,9 @@ const routes = app
   .route("/lists", lists)
   .route("/templates", templates)
   .route("/messages", messages)
+  .route("/linkedMessages", linkedMessages)
+  .route("/interactiveWords", interactiveWords)
+  .route("/errorMessages", errorMessages)
   .route("/bots", bots)
   .route("/nodes", nodes);
 

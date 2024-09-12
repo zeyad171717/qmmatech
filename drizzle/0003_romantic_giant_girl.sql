@@ -1,1 +1,0 @@
-ALTER TABLE "contacts" ADD COLUMN "user_id" text NOT NULL;

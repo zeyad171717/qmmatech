@@ -9,6 +9,7 @@ import { Item } from "./item";
 
 import { Bot } from "lucide-react";
 import { useGetBots } from "@/features/bots/api/use-get-bots";
+import { useEditBot } from "@/features/bots/api/use-edit-bot";
 import { NodesList } from "./nodes-list";
 import { useCreateNode } from "@/features/nodes/api/use-create-node";
 
@@ -45,7 +46,7 @@ export const BotsList = () => {
     );
   };
 
-  if (bots === undefined) {
+  if (botsQuery.isLoading) {
     return (
       <>
         <Item.Skeleton />
@@ -77,6 +78,7 @@ export const BotsList = () => {
             onExpand={() => onExpand(bot.id)}
             expanded={expanded[bot.id]}
             onCreate={() => onCreate(bot.id)}
+            isBot
           />
           {expanded[bot.id] && <NodesList parentBotId={bot.id} level={1} />}
         </div>

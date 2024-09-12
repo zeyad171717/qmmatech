@@ -1,1 +1,0 @@
-ALTER TABLE "lists" DROP COLUMN IF EXISTS "userId";
