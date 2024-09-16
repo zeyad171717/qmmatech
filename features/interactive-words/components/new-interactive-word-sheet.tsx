@@ -33,8 +33,6 @@ export const NewInteractiveWordSheet = () => {
       value: message.id,
     })) ?? [];
 
-  console.log(messagesQuery.data);
-
   const isPending = createMutation.isPending;
   const isLoading = messagesQuery.isLoading;
 

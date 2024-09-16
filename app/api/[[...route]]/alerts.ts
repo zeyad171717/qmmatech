@@ -70,7 +70,6 @@ const app = new Hono()
           to: alerts.to,
           templateId: alerts.templateId,
           time: alerts.time,
-          scheduled: alerts.scheduled,
         })
         .from(alerts)
         .where(and(eq(alerts.userId, auth.userId), eq(alerts.id, id)));
@@ -98,7 +97,6 @@ const app = new Hono()
         to: z.string(),
         templateId: z.string(),
         time: z.string(),
-        scheduled: z.string().optional(),
       })
     ),
     async (c) => {
@@ -124,7 +122,6 @@ const app = new Hono()
           to: values.to,
           templateId: values.templateId,
           time: values.time,
-          scheduled: values.scheduled,
         })
         .returning();
 
@@ -143,7 +140,6 @@ const app = new Hono()
         to: z.string(),
         templateId: z.string(),
         time: z.string(),
-        scheduled: z.string().optional(),
       })
     ),
     async (c) => {
@@ -169,31 +165,24 @@ const app = new Hono()
         );
       }
 
-      const linkedMessagesToUpdate = db.$with("linkedMessages_to_update").as(
+      const alertsToUpdate = db.$with("alerts_to_update").as(
         db
           .select({ id: alerts.id })
           .from(alerts)
           .where(and(eq(alerts.id, id), eq(alerts.userId, auth.userId)))
       );
 
-      const data = await db
-        .with(linkedMessagesToUpdate)
+      const [data] = await db
+        .with(alertsToUpdate)
         .update(alerts)
         .set({
           name: values.name,
-          bodyMessage: values.bodyMessage,
-          bodyEnding: values.bodyEnding,
-          header: values.header,
-          headerType: values.headerType,
-          headerText: values.headerText,
-          footer: values.footer,
-          footerText: values.footerText,
-          activated: values.activated,
-          position: values.position,
+          statusCode: values.statusCode,
+          to: values.to,
+          templateId: values.templateId,
+          time: values.time,
         })
-        .where(
-          inArray(alerts.id, sql`(select id from ${linkedMessagesToUpdate})`)
-        )
+        .where(inArray(alerts.id, sql`(select id from ${alertsToUpdate})`))
         .returning({
           id: alerts.id,
         });
