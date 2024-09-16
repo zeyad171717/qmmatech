@@ -10,6 +10,7 @@ import linkedMessages from "./linked-messages";
 import interactiveWords from "./interactive-words";
 import bots from "./bots";
 import nodes from "./nodes";
+import alerts from "./alerts";
 
 export const runtime = "edge";
 

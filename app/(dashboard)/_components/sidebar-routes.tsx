@@ -5,6 +5,7 @@ import {
   Contact,
   Send,
   Bot,
+  Megaphone,
 } from "lucide-react";
 
 import { SidebarItem } from "./sidebar-item";
@@ -39,6 +40,11 @@ const routes = [
     icon: Bot,
     label: "Chat bot",
     href: "/chat-bot",
+  },
+  {
+    icon: Megaphone,
+    label: "Alerts",
+    href: "/alerts",
   },
 ];
 

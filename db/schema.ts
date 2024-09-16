@@ -380,7 +380,6 @@ export const alerts = pgTable("alerts", {
   statusCode: text("status_code").notNull(),
   name: text("name").notNull(),
   time: text("time").notNull(),
-  scheduled: text("scheduled"),
   to: text("to").notNull(),
   templateId: text("templateId").notNull(),
   active: boolean("active").default(true),
