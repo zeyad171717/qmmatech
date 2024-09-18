@@ -7,13 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { InferResponseType } from "hono";
 import { client } from "@/lib/hono";
-import { Actions } from "./actions";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
-import { formatDate } from "@/lib/utils";
+import { describeRange, formatDate } from "@/lib/utils";
+import { Actions } from "./abandant-carts-actions";
 
 export type ResponseType = InferResponseType<
-  typeof client.api.alerts.$get,
+  (typeof client.api.alerts)["abandant-carts"]["$get"],
   200
 >["data"][0];
 
@@ -55,20 +55,6 @@ export const columns: ColumnDef<ResponseType>[] = [
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           Template
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-  },
-  {
-    accessorKey: "to",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Receiver
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
@@ -122,6 +108,39 @@ export const columns: ColumnDef<ResponseType>[] = [
         <Badge variant={active ? "secondary" : "destructive"}>
           {active ? "Active" : "Inactive"}
         </Badge>
+      );
+    },
+  },
+  {
+    accessorKey: "minCartValue",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Cart Value
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      const { minCartValue, maxCartValue, city } = row.original;
+
+      return describeRange(minCartValue, maxCartValue);
+    },
+  },
+  {
+    accessorKey: "city",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          City
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
       );
     },
   },

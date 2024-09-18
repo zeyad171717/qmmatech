@@ -1,13 +1,41 @@
+CREATE TABLE IF NOT EXISTS "abundantCarts" (
+	"id" text PRIMARY KEY NOT NULL,
+	"user_id" text NOT NULL,
+	"status_code" text NOT NULL,
+	"name" text NOT NULL,
+	"time" text NOT NULL,
+	"scheduledDays" integer,
+	"scheduledHours" integer,
+	"scheduledMinutes" integer,
+	"templateId" text NOT NULL,
+	"active" boolean DEFAULT true,
+	"minCartValue" integer NOT NULL,
+	"maxCartValue" integer NOT NULL,
+	"city" text NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "alerts" (
 	"id" text PRIMARY KEY NOT NULL,
 	"user_id" text NOT NULL,
 	"status_code" text NOT NULL,
 	"name" text NOT NULL,
 	"time" text NOT NULL,
-	"scheduled" text,
+	"scheduledDays" integer,
+	"scheduledHours" integer,
+	"scheduledMinutes" integer,
 	"to" text NOT NULL,
 	"templateId" text NOT NULL,
 	"active" boolean DEFAULT true
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "bankTransfer" (
+	"id" text PRIMARY KEY NOT NULL,
+	"user_id" text NOT NULL,
+	"alertId" text NOT NULL,
+	"messageAfterFirstButtonId" text NOT NULL,
+	"messageAfterSecondButtonId" text NOT NULL,
+	"errorMessageId" text NOT NULL,
+	"statusErrorMessageId" text NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "bots" (
@@ -123,6 +151,14 @@ CREATE TABLE IF NOT EXISTS "messages" (
 	"creation_date" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "newLogin" (
+	"id" text PRIMARY KEY NOT NULL,
+	"user_id" text NOT NULL,
+	"alertId" text NOT NULL,
+	"templateId" text NOT NULL,
+	"status" text NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "nodes" (
 	"id" text PRIMARY KEY NOT NULL,
 	"user_id" text NOT NULL,
@@ -132,6 +168,28 @@ CREATE TABLE IF NOT EXISTS "nodes" (
 	"errorMessageId" text NOT NULL,
 	"parentId" text,
 	"index" integer
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "payOnReceive" (
+	"id" text PRIMARY KEY NOT NULL,
+	"user_id" text NOT NULL,
+	"alertId" text NOT NULL,
+	"messageAfterFirstButtonId" text NOT NULL,
+	"messageAfterSecondButtonId" text NOT NULL,
+	"errorMessageId" text NOT NULL,
+	"statusErrorMessageId" text NOT NULL,
+	"confirmationStatus" text NOT NULL,
+	"cancellationStatus" text NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "receiverGift" (
+	"id" text PRIMARY KEY NOT NULL,
+	"user_id" text NOT NULL,
+	"alertId" text NOT NULL,
+	"messageAfterFirstButtonId" text NOT NULL,
+	"messageAfterSecondButtonId" text NOT NULL,
+	"errorMessageId" text NOT NULL,
+	"statusErrorMessageId" text NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "templateButtonTypes" (

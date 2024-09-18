@@ -35,12 +35,14 @@ import { Textarea } from "@/components/ui/textarea";
 const formSchema = z.object({
   name: z.string(),
   statusCode: z.string(),
-  to: z.enum(["Customer", "Receiver"]),
   templateId: z.string(),
   time: z.string(),
-  scheduledDays: z.number().min(0),
-  scheduledHours: z.number().min(0),
-  scheduledMinutes: z.number().min(0),
+  scheduledDays: z.number(),
+  scheduledHours: z.number(),
+  scheduledMinutes: z.number(),
+  minCartValue: z.number(),
+  maxCartValue: z.number(),
+  city: z.string(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -53,7 +55,7 @@ type Props = {
   id?: string;
 };
 
-export const AlertForm = ({
+export const AbandantCartForm = ({
   defaultValues,
   onSubmit,
   disabled,
@@ -112,34 +114,84 @@ export const AlertForm = ({
               <FormControl>
                 <Input
                   disabled={isSubmitting || disabled}
-                  placeholder="Enter alert name"
+                  placeholder="Enter name"
                   {...field}
                 />
               </FormControl>
             </FormItem>
           )}
         />
+        <div className="flex flex-row">
+          <FormField
+            name="minCartValue"
+            control={form.control}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Min Cart Value</FormLabel>
+                <FormControl>
+                  <Input
+                    disabled={isSubmitting || disabled}
+                    placeholder="Enter min value"
+                    type="number"
+                    name={field.name}
+                    onBlur={field.onBlur}
+                    value={field.value}
+                    onChange={(e) => {
+                      if (e.target.value >= 0) {
+                        form.setValue("minCartValue", Number(e.target.value));
+                        if (form.getValues().maxCartValue < e.target.value) {
+                          form.setValue("maxCartValue", Number(e.target.value));
+                        }
+                      }
+                    }}
+                    ref={field.ref}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+          <FormField
+            name="maxCartValue"
+            control={form.control}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Max Cart Value</FormLabel>
+                <FormControl>
+                  <Input
+                    disabled={isSubmitting || disabled}
+                    placeholder="Enter max value"
+                    type="number"
+                    name={field.name}
+                    onBlur={field.onBlur}
+                    value={field.value}
+                    onChange={(e) => {
+                      if (e.target.value >= 0) {
+                        form.setValue("maxCartValue", Number(e.target.value));
+                        if (form.getValues().minCartValue > e.target.value) {
+                          form.setValue("minCartValue", Number(e.target.value));
+                        }
+                      }
+                    }}
+                    ref={field.ref}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+        </div>
         <FormField
-          name="to"
+          name="city"
           control={form.control}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Receiver</FormLabel>
-              <Select
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-                disabled={isSubmitting || disabled}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a receiver" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="Customer">Customer</SelectItem>
-                  <SelectItem value="Receiver">Receiver</SelectItem>
-                </SelectContent>
-              </Select>
+              <FormLabel>City</FormLabel>
+              <FormControl>
+                <Input
+                  disabled={isSubmitting || disabled}
+                  placeholder="Enter city"
+                  {...field}
+                />
+              </FormControl>
             </FormItem>
           )}
         />
@@ -274,7 +326,7 @@ export const AlertForm = ({
         />
 
         <Button className="w-full" disabled={disabled || isSubmitting}>
-          {id ? "Save changes" : "Create Alert"}
+          {id ? "Save changes" : "Create Abandant cart"}
         </Button>
       </form>
     </Form>

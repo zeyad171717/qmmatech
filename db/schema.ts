@@ -376,10 +376,14 @@ export const nodesRelations = relations(nodes, ({ one, many }) => ({
 
 export const alerts = pgTable("alerts", {
   id: text("id").primaryKey(),
+  sr: serial("sr"),
   userId: text("user_id").notNull(),
   statusCode: text("status_code").notNull(),
   name: text("name").notNull(),
   time: text("time").notNull(),
+  scheduledDays: integer("scheduledDays"),
+  scheduledHours: integer("scheduledHours"),
+  scheduledMinutes: integer("scheduledMinutes"),
   to: text("to").notNull(),
   templateId: text("templateId").notNull(),
   active: boolean("active").default(true),
@@ -387,6 +391,177 @@ export const alerts = pgTable("alerts", {
 export const alertsRelations = relations(alerts, ({ one, many }) => ({
   template: one(templates, {
     fields: [alerts.templateId],
+    references: [templates.id],
+  }),
+}));
+
+export const abundantCarts = pgTable("abundantCarts", {
+  id: text("id").primaryKey(),
+  sr: serial("sr"),
+  userId: text("user_id").notNull(),
+  statusCode: text("status_code").notNull(),
+  name: text("name").notNull(),
+  time: text("time").notNull(),
+  scheduledDays: integer("scheduledDays"),
+  scheduledHours: integer("scheduledHours"),
+  scheduledMinutes: integer("scheduledMinutes"),
+  templateId: text("templateId").notNull(),
+  active: boolean("active").default(true),
+  minCartValue: integer("minCartValue").notNull(),
+  maxCartValue: integer("maxCartValue").notNull(),
+  city: text("city").notNull(),
+});
+export const abundantCartsRelations = relations(
+  abundantCarts,
+  ({ one, many }) => ({
+    template: one(templates, {
+      fields: [abundantCarts.templateId],
+      references: [templates.id],
+    }),
+  })
+);
+
+export const receiverGift = pgTable("receiverGift", {
+  id: text("id").primaryKey(),
+  sr: serial("sr"),
+  userId: text("user_id").notNull(),
+  alertId: text("alertId").notNull(),
+  messageAfterFirstButtonId: text("messageAfterFirstButtonId").notNull(),
+  messageAfterSecondButtonId: text("messageAfterSecondButtonId").notNull(),
+  errorMessageId: text("errorMessageId").notNull(),
+  statusErrorMessageId: text("statusErrorMessageId").notNull(),
+  scheduledDays: integer("scheduledDays"),
+  scheduledHours: integer("scheduledHours"),
+  scheduledMinutes: integer("scheduledMinutes"),
+  time: text("time").notNull(),
+});
+export const receiverGiftRelations = relations(
+  receiverGift,
+  ({ one, many }) => ({
+    alert: one(alerts, {
+      fields: [receiverGift.alertId],
+      references: [alerts.id],
+    }),
+    messageAfterFirstButton: one(messages, {
+      fields: [receiverGift.messageAfterFirstButtonId],
+      references: [messages.id],
+    }),
+    messageAfterSecondButton: one(messages, {
+      fields: [receiverGift.messageAfterSecondButtonId],
+      references: [messages.id],
+    }),
+    errorMessage: one(errorMessages, {
+      fields: [receiverGift.errorMessageId],
+      references: [errorMessages.id],
+    }),
+    statusErrorMessage: one(errorMessages, {
+      fields: [receiverGift.statusErrorMessageId],
+      references: [errorMessages.id],
+    }),
+  })
+);
+
+export const payOnReceive = pgTable("payOnReceive", {
+  id: text("id").primaryKey(),
+  sr: serial("sr"),
+  userId: text("user_id").notNull(),
+  alertId: text("alertId").notNull(),
+  messageAfterFirstButtonId: text("messageAfterFirstButtonId").notNull(),
+  messageAfterSecondButtonId: text("messageAfterSecondButtonId").notNull(),
+  errorMessageId: text("errorMessageId").notNull(),
+  statusErrorMessageId: text("statusErrorMessageId").notNull(),
+  confirmationStatus: text("confirmationStatus").notNull(),
+  cancellationStatus: text("cancellationStatus").notNull(),
+  scheduledDays: integer("scheduledDays"),
+  scheduledHours: integer("scheduledHours"),
+  scheduledMinutes: integer("scheduledMinutes"),
+  time: text("time").notNull(),
+});
+export const payOnReceiveRelations = relations(
+  payOnReceive,
+  ({ one, many }) => ({
+    alert: one(alerts, {
+      fields: [payOnReceive.alertId],
+      references: [alerts.id],
+    }),
+    messageAfterFirstButton: one(messages, {
+      fields: [payOnReceive.messageAfterFirstButtonId],
+      references: [messages.id],
+    }),
+    messageAfterSecondButton: one(messages, {
+      fields: [payOnReceive.messageAfterSecondButtonId],
+      references: [messages.id],
+    }),
+    errorMessage: one(errorMessages, {
+      fields: [payOnReceive.errorMessageId],
+      references: [errorMessages.id],
+    }),
+    statusErrorMessage: one(errorMessages, {
+      fields: [payOnReceive.statusErrorMessageId],
+      references: [errorMessages.id],
+    }),
+  })
+);
+
+export const bankTransfer = pgTable("bankTransfer", {
+  id: text("id").primaryKey(),
+  sr: serial("sr"),
+  userId: text("user_id").notNull(),
+  alertId: text("alertId").notNull(),
+  messageAfterFirstButtonId: text("messageAfterFirstButtonId").notNull(),
+  messageAfterSecondButtonId: text("messageAfterSecondButtonId").notNull(),
+  errorMessageId: text("errorMessageId").notNull(),
+  statusErrorMessageId: text("statusErrorMessageId").notNull(),
+  scheduledDays: integer("scheduledDays"),
+  scheduledHours: integer("scheduledHours"),
+  scheduledMinutes: integer("scheduledMinutes"),  
+  time: text("time").notNull(),
+});
+export const bankTransferRelations = relations(
+  bankTransfer,
+  ({ one, many }) => ({
+    alert: one(alerts, {
+      fields: [bankTransfer.alertId],
+      references: [alerts.id],
+    }),
+    messageAfterFirstButton: one(messages, {
+      fields: [bankTransfer.messageAfterFirstButtonId],
+      references: [messages.id],
+    }),
+    messageAfterSecondButton: one(messages, {
+      fields: [bankTransfer.messageAfterSecondButtonId],
+      references: [messages.id],
+    }),
+    errorMessage: one(errorMessages, {
+      fields: [bankTransfer.errorMessageId],
+      references: [errorMessages.id],
+    }),
+    statusErrorMessage: one(errorMessages, {
+      fields: [bankTransfer.statusErrorMessageId],
+      references: [errorMessages.id],
+    }),
+  })
+);
+
+export const newLogin = pgTable("newLogin", {
+  id: text("id").primaryKey(),
+  sr: serial("sr"),
+  userId: text("user_id").notNull(),
+  alertId: text("alertId").notNull(),
+  templateId: text("templateId").notNull(),
+  status: text("status").notNull(),
+  scheduledDays: integer("scheduledDays"),
+  scheduledHours: integer("scheduledHours"),
+  scheduledMinutes: integer("scheduledMinutes"),
+  time: text("time").notNull(),
+});
+export const newLoginRelations = relations(newLogin, ({ one, many }) => ({
+  alert: one(alerts, {
+    fields: [newLogin.alertId],
+    references: [alerts.id],
+  }),
+  template: one(templates, {
+    fields: [newLogin.templateId],
     references: [templates.id],
   }),
 }));

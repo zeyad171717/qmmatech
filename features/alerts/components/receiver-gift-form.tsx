@@ -33,14 +33,15 @@ import { Combobox } from "@/components/ui/combobox";
 import { Textarea } from "@/components/ui/textarea";
 
 const formSchema = z.object({
-  name: z.string(),
-  statusCode: z.string(),
-  to: z.enum(["Customer", "Receiver"]),
-  templateId: z.string(),
   time: z.string(),
-  scheduledDays: z.number().min(0),
-  scheduledHours: z.number().min(0),
-  scheduledMinutes: z.number().min(0),
+  scheduledDays: z.number(),
+  scheduledHours: z.number(),
+  scheduledMinutes: z.number(),
+  alertId: z.string(),
+  messageAfterFirstButtonId: z.string(),
+  messageAfterSecondButtonId: z.string(),
+  errorMessageId: z.string(),
+  statusErrorMessageId: z.string(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -49,15 +50,19 @@ type Props = {
   defaultValues?: FormValues;
   onSubmit: (values: FormValues) => void;
   disabled?: boolean;
-  templateOptions: { label: string; value: string }[];
+  alertOptions: { label: string; value: string }[];
+  messageOptions: { label: string; value: string }[];
+  errorMessageOptions: { label: string; value: string }[];
   id?: string;
 };
 
-export const AlertForm = ({
+export const ReceiverGiftForm = ({
   defaultValues,
   onSubmit,
   disabled,
-  templateOptions,
+  alertOptions,
+  messageOptions,
+  errorMessageOptions,
   id,
 }: Props) => {
   const form = useForm<FormValues>({
@@ -76,73 +81,6 @@ export const AlertForm = ({
         onSubmit={form.handleSubmit(handleSubmit)}
         className="space-y-4 pt-4"
       >
-        <FormField
-          name="statusCode"
-          control={form.control}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Status Code</FormLabel>
-              <Select
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-                disabled={isSubmitting || disabled}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a status code" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="status-1">Status 1</SelectItem>
-                  <SelectItem value="status-2">Status 2</SelectItem>
-                  <SelectItem value="status-3">Status 3</SelectItem>
-                  <SelectItem value="status-4">Status 4</SelectItem>
-                  <SelectItem value="status-5">Status 5</SelectItem>
-                </SelectContent>
-              </Select>
-            </FormItem>
-          )}
-        />
-        <FormField
-          name="name"
-          control={form.control}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Name</FormLabel>
-              <FormControl>
-                <Input
-                  disabled={isSubmitting || disabled}
-                  placeholder="Enter alert name"
-                  {...field}
-                />
-              </FormControl>
-            </FormItem>
-          )}
-        />
-        <FormField
-          name="to"
-          control={form.control}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Receiver</FormLabel>
-              <Select
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-                disabled={isSubmitting || disabled}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a receiver" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="Customer">Customer</SelectItem>
-                  <SelectItem value="Receiver">Receiver</SelectItem>
-                </SelectContent>
-              </Select>
-            </FormItem>
-          )}
-        />
         <FormField
           name="time"
           control={form.control}
@@ -257,13 +195,81 @@ export const AlertForm = ({
         )}
         <FormField
           control={form.control}
-          name="templateId"
+          name="alertId"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Template</FormLabel>
+              <FormLabel>Alert</FormLabel>
               <FormControl>
                 <Combobox
-                  options={templateOptions}
+                  options={alertOptions}
+                  value={field.value}
+                  onChange={field.onChange}
+                  disabled={isSubmitting || disabled}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="messageAfterFirstButtonId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Message after first button</FormLabel>
+              <FormControl>
+                <Combobox
+                  options={messageOptions}
+                  value={field.value}
+                  onChange={field.onChange}
+                  disabled={isSubmitting || disabled}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="messageAfterSecondButtonId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Message after second button</FormLabel>
+              <FormControl>
+                <Combobox
+                  options={messageOptions}
+                  value={field.value}
+                  onChange={field.onChange}
+                  disabled={isSubmitting || disabled}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="errorMessageId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Error message</FormLabel>
+              <FormControl>
+                <Combobox
+                  options={errorMessageOptions}
+                  value={field.value}
+                  onChange={field.onChange}
+                  disabled={isSubmitting || disabled}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="statusErrorMessageId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Status error message</FormLabel>
+              <FormControl>
+                <Combobox
+                  options={errorMessageOptions}
                   value={field.value}
                   onChange={field.onChange}
                   disabled={isSubmitting || disabled}
@@ -274,7 +280,7 @@ export const AlertForm = ({
         />
 
         <Button className="w-full" disabled={disabled || isSubmitting}>
-          {id ? "Save changes" : "Create Alert"}
+          {id ? "Save changes" : "Create Receiver Gift"}
         </Button>
       </form>
     </Form>

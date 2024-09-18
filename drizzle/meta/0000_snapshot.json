@@ -1,9 +1,98 @@
 {
-  "id": "125d29d9-30b3-412f-b7b1-d4b1bd679c51",
+  "id": "1de08061-625d-4a0a-becf-3cfadaa1b89b",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
   "tables": {
+    "abundantCarts": {
+      "name": "abundantCarts",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status_code": {
+          "name": "status_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "time": {
+          "name": "time",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "scheduledDays": {
+          "name": "scheduledDays",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "scheduledHours": {
+          "name": "scheduledHours",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "scheduledMinutes": {
+          "name": "scheduledMinutes",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "templateId": {
+          "name": "templateId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "active": {
+          "name": "active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": true
+        },
+        "minCartValue": {
+          "name": "minCartValue",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "maxCartValue": {
+          "name": "maxCartValue",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "city": {
+          "name": "city",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
     "alerts": {
       "name": "alerts",
       "schema": "",
@@ -38,9 +127,21 @@
           "primaryKey": false,
           "notNull": true
         },
-        "scheduled": {
-          "name": "scheduled",
-          "type": "text",
+        "scheduledDays": {
+          "name": "scheduledDays",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "scheduledHours": {
+          "name": "scheduledHours",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "scheduledMinutes": {
+          "name": "scheduledMinutes",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
@@ -62,6 +163,58 @@
           "primaryKey": false,
           "notNull": false,
           "default": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "bankTransfer": {
+      "name": "bankTransfer",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "alertId": {
+          "name": "alertId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "messageAfterFirstButtonId": {
+          "name": "messageAfterFirstButtonId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "messageAfterSecondButtonId": {
+          "name": "messageAfterSecondButtonId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "errorMessageId": {
+          "name": "errorMessageId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "statusErrorMessageId": {
+          "name": "statusErrorMessageId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
         }
       },
       "indexes": {},
@@ -720,6 +873,46 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
+    "newLogin": {
+      "name": "newLogin",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "alertId": {
+          "name": "alertId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "templateId": {
+          "name": "templateId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
     "nodes": {
       "name": "nodes",
       "schema": "",
@@ -771,6 +964,122 @@
           "type": "integer",
           "primaryKey": false,
           "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "payOnReceive": {
+      "name": "payOnReceive",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "alertId": {
+          "name": "alertId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "messageAfterFirstButtonId": {
+          "name": "messageAfterFirstButtonId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "messageAfterSecondButtonId": {
+          "name": "messageAfterSecondButtonId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "errorMessageId": {
+          "name": "errorMessageId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "statusErrorMessageId": {
+          "name": "statusErrorMessageId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "confirmationStatus": {
+          "name": "confirmationStatus",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cancellationStatus": {
+          "name": "cancellationStatus",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "receiverGift": {
+      "name": "receiverGift",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "alertId": {
+          "name": "alertId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "messageAfterFirstButtonId": {
+          "name": "messageAfterFirstButtonId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "messageAfterSecondButtonId": {
+          "name": "messageAfterSecondButtonId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "errorMessageId": {
+          "name": "errorMessageId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "statusErrorMessageId": {
+          "name": "statusErrorMessageId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
         }
       },
       "indexes": {},

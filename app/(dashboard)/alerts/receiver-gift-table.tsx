@@ -5,19 +5,19 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, Plus } from "lucide-react";
 import { DataTable } from "@/components/data-table";
 import { Skeleton } from "@/components/ui/skeleton";
-import { columns } from "./columns";
 import { useQueryClient } from "@tanstack/react-query";
-import { useGetAlerts } from "@/features/alerts/api/use-get-alerts";
-import { useNewAlert } from "@/features/alerts/hooks/use-new-alert";
+import { useNewReceiverGift } from "@/features/alerts/hooks/use-new-receiver-gift";
+import { useGetReceiverGifts } from "@/features/alerts/api/use-get-receiver-gifts";
+import { columns } from "./receiver-gift-columns";
 
-export const AlertsTable = () => {
-  const newAlert = useNewAlert();
-  const alertsQuery = useGetAlerts();
-  const alerts = alertsQuery.data || [];
+export const ReceiverGiftTable = () => {
+  const newReceiverGift = useNewReceiverGift();
+  const receiverGiftsQuery = useGetReceiverGifts();
+  const receiverGifts = receiverGiftsQuery.data || [];
 
-  const isDisabled = alertsQuery.isLoading;
+  const isDisabled = receiverGiftsQuery.isLoading;
 
-  if (alertsQuery.isLoading) {
+  if (receiverGiftsQuery.isLoading) {
     return (
       <div className="max-w-screen-2xl mx-auto w-full pb-10">
         <Card className="border-none drop-shadow-sm">
@@ -37,10 +37,10 @@ export const AlertsTable = () => {
   return (
     <Card className="border-none drop-shadow-sm">
       <CardHeader className="gap-y-2 lg:flex-row lg:items-start lg:justify-between">
-        <CardTitle className="text-xl line-clamp-1">Alerts</CardTitle>
+        <CardTitle className="text-xl line-clamp-1">Receiver Gift</CardTitle>
         <div className="flex flex-col lg:flex-row gap-y-2 items-center gap-x-2">
           <Button
-            onClick={newAlert.onOpen}
+            onClick={newReceiverGift.onOpen}
             size="sm"
             className="w-full lg:w-auto"
           >
@@ -53,7 +53,7 @@ export const AlertsTable = () => {
         <DataTable
           filterKey="name"
           columns={columns}
-          data={alerts}
+          data={receiverGifts}
           disabled={isDisabled}
         />
       </CardContent>
