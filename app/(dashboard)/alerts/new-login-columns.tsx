@@ -7,13 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { InferResponseType } from "hono";
 import { client } from "@/lib/hono";
-import { Actions } from "./actions";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
-import { formatDate } from "@/lib/utils";
+import { describeRange, formatDate } from "@/lib/utils";
+import { Actions } from "./new-login-actions";
 
 export type ResponseType = InferResponseType<
-  typeof client.api.alerts.$get,
+  (typeof client.api.alerts)["new-login"]["$get"],
   200
 >["data"][0];
 
@@ -33,14 +33,14 @@ export const columns: ColumnDef<ResponseType>[] = [
     },
   },
   {
-    accessorKey: "name",
+    accessorKey: "alert",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Name
+          Alert
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
@@ -61,14 +61,14 @@ export const columns: ColumnDef<ResponseType>[] = [
     },
   },
   {
-    accessorKey: "to",
+    accessorKey: "status",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Receiver
+          Status
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );

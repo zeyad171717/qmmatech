@@ -1,6 +1,6 @@
 {
-  "id": "87e07ba3-d2e5-46bd-a89f-f1c0586a4d60",
-  "prevId": "1de08061-625d-4a0a-becf-3cfadaa1b89b",
+  "id": "74fb9b9d-1ce1-413e-977d-8c7d5ff78b9a",
+  "prevId": "87e07ba3-d2e5-46bd-a89f-f1c0586a4d60",
   "version": "5",
   "dialect": "pg",
   "tables": {
@@ -12,6 +12,12 @@
           "name": "id",
           "type": "text",
           "primaryKey": true,
+          "notNull": true
+        },
+        "sr": {
+          "name": "sr",
+          "type": "serial",
+          "primaryKey": false,
           "notNull": true
         },
         "user_id": {
@@ -103,6 +109,12 @@
           "primaryKey": true,
           "notNull": true
         },
+        "sr": {
+          "name": "sr",
+          "type": "serial",
+          "primaryKey": false,
+          "notNull": true
+        },
         "user_id": {
           "name": "user_id",
           "type": "text",
@@ -180,6 +192,12 @@
           "primaryKey": true,
           "notNull": true
         },
+        "sr": {
+          "name": "sr",
+          "type": "serial",
+          "primaryKey": false,
+          "notNull": true
+        },
         "user_id": {
           "name": "user_id",
           "type": "text",
@@ -233,6 +251,12 @@
           "type": "integer",
           "primaryKey": false,
           "notNull": false
+        },
+        "time": {
+          "name": "time",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
         }
       },
       "indexes": {},
@@ -901,6 +925,12 @@
           "primaryKey": true,
           "notNull": true
         },
+        "sr": {
+          "name": "sr",
+          "type": "serial",
+          "primaryKey": false,
+          "notNull": true
+        },
         "user_id": {
           "name": "user_id",
           "type": "text",
@@ -942,6 +972,12 @@
           "type": "integer",
           "primaryKey": false,
           "notNull": false
+        },
+        "time": {
+          "name": "time",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
         }
       },
       "indexes": {},
@@ -1017,6 +1053,12 @@
           "primaryKey": true,
           "notNull": true
         },
+        "sr": {
+          "name": "sr",
+          "type": "serial",
+          "primaryKey": false,
+          "notNull": true
+        },
         "user_id": {
           "name": "user_id",
           "type": "text",
@@ -1082,6 +1124,12 @@
           "type": "integer",
           "primaryKey": false,
           "notNull": false
+        },
+        "time": {
+          "name": "time",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
         }
       },
       "indexes": {},
@@ -1097,6 +1145,12 @@
           "name": "id",
           "type": "text",
           "primaryKey": true,
+          "notNull": true
+        },
+        "sr": {
+          "name": "sr",
+          "type": "serial",
+          "primaryKey": false,
           "notNull": true
         },
         "user_id": {
@@ -1152,6 +1206,12 @@
           "type": "integer",
           "primaryKey": false,
           "notNull": false
+        },
+        "time": {
+          "name": "time",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
         }
       },
       "indexes": {},

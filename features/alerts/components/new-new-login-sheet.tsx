@@ -8,27 +8,27 @@ import {
 import { z } from "zod";
 import { AlertForm } from "./alert-form";
 import { Loader2 } from "lucide-react";
-import { useNewAlert } from "../hooks/use-new-alert";
-import { useCreateAlert } from "../api/use-create-alert";
 import { useGetTemplates } from "@/features/templates/api/use-get-templates";
+import { useNewNewLogin } from "@/features/alerts/hooks/use-new-new-login";
+import { useCreateNewLogin } from "@/features/alerts/api/use-create-new-login";
+import { useGetAlerts } from "@/features/alerts/api/use-get-alerts";
 
 const formSchema = z.object({
-  name: z.string(),
-  statusCode: z.string(),
-  to: z.enum(["Customer", "Receiver"]),
+  status: z.string(),
   templateId: z.string(),
+  alertId: z.string(),
   time: z.string(),
-  scheduledDays: z.number().min(0),
-  scheduledHours: z.number().min(0),
-  scheduledMinutes: z.number().min(0),
+  scheduledDays: z.number(),
+  scheduledHours: z.number(),
+  scheduledMinutes: z.number(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
-export const NewAlertSheet = () => {
-  const { isOpen, onClose } = useNewAlert();
+export const NewNewLoginSheet = () => {
+  const { isOpen, onClose } = useNewNewLogin();
 
-  const createMutation = useCreateAlert();
+  const createMutation = useCreateNewLogin();
 
   const templatesQuery = useGetTemplates();
   const templateOptions =
@@ -37,8 +37,15 @@ export const NewAlertSheet = () => {
       value: template.id,
     })) ?? [];
 
+  const alertsQuery = useGetAlerts();
+  const alertOptions =
+    alertsQuery.data?.map((alert) => ({
+      label: alert.name,
+      value: alert.id,
+    })) ?? [];
+
   const isPending = createMutation.isPending;
-  const isLoading = templatesQuery.isLoading;
+  const isLoading = templatesQuery.isLoading || alertsQuery.isLoading;
 
   const onSubmit = (json: FormValues) => {
     createMutation.mutate(
@@ -67,16 +74,16 @@ export const NewAlertSheet = () => {
             onSubmit={onSubmit}
             disabled={isPending}
             defaultValues={{
-              name: "",
-              statusCode: "",
-              to: "Customer",
+              status: "",
               templateId: "",
+              alertId: "",
               time: "Immediate",
               scheduledDays: 0,
               scheduledHours: 0,
               scheduledMinutes: 0,
             }}
             templateOptions={templateOptions}
+            alertOptions={alertOptions}
           />
         )}
       </SheetContent>

@@ -7,36 +7,30 @@ import {
 } from "@/components/ui/sheet";
 import { z } from "zod";
 import { Loader2 } from "lucide-react";
-import { useConfirm } from "@/hooks/use-confirm";
-import { useOpenAlert } from "../hooks/use-open-alert";
-import { useGetAlert } from "../api/use-get-alert";
-import { useEditAlert } from "../api/use-edit-alert";
+import { useOpenNewLogin } from "../hooks/use-open-new-login";
+import { useGetNewLogin } from "../api/use-get-new-login";
+import { useEditNewLogin } from "../api/use-edit-new-login";
 import { useGetTemplates } from "@/features/templates/api/use-get-templates";
-import { AlertForm } from "./alert-form";
+import { useGetAlerts } from "@/features/templates/api/use-get-templates";
+import { NewLoginForm } from "./new-login-form";
 
 const formSchema = z.object({
-  name: z.string(),
-  statusCode: z.string(),
-  to: z.enum(["Customer", "Receiver"]),
+  status: z.string(),
   templateId: z.string(),
+  alertId: z.string(),
   time: z.string(),
-  scheduledDays: z.number().min(0),
-  scheduledHours: z.number().min(0),
-  scheduledMinutes: z.number().min(0),
+  scheduledDays: z.number(),
+  scheduledHours: z.number(),
+  scheduledMinutes: z.number(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
-export const EditAlertSheet = () => {
-  const { isOpen, onClose, id } = useOpenAlert();
+export const EditNewLoginSheet = () => {
+  const { isOpen, onClose, id } = useOpenNewLogin();
 
-  const [ConfirmDialog, confirm] = useConfirm(
-    "Are you sure?",
-    "You are about to delete this alert."
-  );
-
-  const alertQuery = useGetAlert(id);
-  const editMutation = useEditAlert(id);
+  const newLoginQuery = useGetNewLogin(id);
+  const editMutation = useEditNewLogin(id);
 
   const templatesQuery = useGetTemplates();
   const templateOptions =
@@ -45,8 +39,16 @@ export const EditAlertSheet = () => {
       value: template.id,
     })) ?? [];
 
+  const alertsQuery = useGetAlerts();
+  const alertOptions =
+    alertsQuery.data?.map((alert) => ({
+      label: alert.name,
+      value: alert.id,
+    })) ?? [];
+
   const isPending = editMutation.isPending;
-  const isLoading = alertQuery.isLoading || templatesQuery.isLoading;
+  const isLoading =
+    alertQuery.isLoading || templatesQuery.isLoading || alertsQuery.isLoading;
 
   const onSubmit = (values: FormValues) => {
     editMutation.mutate(values, {
@@ -56,21 +58,19 @@ export const EditAlertSheet = () => {
     });
   };
 
-  const defaultValues = alertQuery.data
+  const defaultValues = newLoginQuery.data
     ? {
-        name: alertQuery.data.name,
-        statusCode: alertQuery.data.statusCode,
-        to: alertQuery.data.to,
-        templateId: alertQuery.data.templateId,
-        time: alertQuery.data.time,
-        scheduledDays: alertQuery.data.scheduledDays,
-        scheduledHours: alertQuery.data.scheduledHours,
-        scheduledMinutes: alertQuery.data.scheduledMinutes,
+        alertId: alertQuery.data.alertId,
+        status: newLoginQuery.data.status,
+        templateId: newLoginQuery.data.templateId,
+        time: newLoginQuery.data.time,
+        scheduledDays: newLoginQuery.data.scheduledDays,
+        scheduledHours: newLoginQuery.data.scheduledHours,
+        scheduledMinutes: newLoginQuery.data.scheduledMinutes,
       }
     : {
-        name: "",
-        statusCode: "",
-        to: "Customer",
+        alertId: "",
+        status: "",
         templateId: "",
         time: "Immediate",
         scheduledDays: 0,
@@ -79,8 +79,6 @@ export const EditAlertSheet = () => {
       };
 
   return (
-    <>
-      <ConfirmDialog />
       <Sheet open={isOpen} onOpenChange={onClose}>
         <SheetContent className="space-y-4">
           <SheetHeader>
@@ -92,16 +90,16 @@ export const EditAlertSheet = () => {
               <Loader2 className="size-4 textMuted-foreground animate-spin" />
             </div>
           ) : (
-            <AlertForm
+            <NewLoginForm
               onSubmit={onSubmit}
               disabled={isPending}
               templateOptions={templateOptions}
+              alertOptions={alertOptions}
               defaultValues={defaultValues}
               id={id}
             />
           )}
         </SheetContent>
       </Sheet>
-    </>
   );
 };

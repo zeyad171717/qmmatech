@@ -33,14 +33,13 @@ import { Combobox } from "@/components/ui/combobox";
 import { Textarea } from "@/components/ui/textarea";
 
 const formSchema = z.object({
-  name: z.string(),
-  statusCode: z.string(),
-  to: z.enum(["Customer", "Receiver"]),
+  status: z.string(),
   templateId: z.string(),
+  alertId: z.string(),
   time: z.string(),
-  scheduledDays: z.number().min(0),
-  scheduledHours: z.number().min(0),
-  scheduledMinutes: z.number().min(0),
+  scheduledDays: z.number(),
+  scheduledHours: z.number(),
+  scheduledMinutes: z.number(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -50,14 +49,16 @@ type Props = {
   onSubmit: (values: FormValues) => void;
   disabled?: boolean;
   templateOptions: { label: string; value: string }[];
+  alertOptions: { label: string; value: string }[];
   id?: string;
 };
 
-export const AlertForm = ({
+export const NewLoginForm = ({
   defaultValues,
   onSubmit,
   disabled,
   templateOptions,
+  alertOptions,
   id,
 }: Props) => {
   const form = useForm<FormValues>({
@@ -76,73 +77,6 @@ export const AlertForm = ({
         onSubmit={form.handleSubmit(handleSubmit)}
         className="space-y-4 pt-4"
       >
-        <FormField
-          name="statusCode"
-          control={form.control}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Status Code</FormLabel>
-              <Select
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-                disabled={isSubmitting || disabled}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a status code" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="status-1">Status 1</SelectItem>
-                  <SelectItem value="status-2">Status 2</SelectItem>
-                  <SelectItem value="status-3">Status 3</SelectItem>
-                  <SelectItem value="status-4">Status 4</SelectItem>
-                  <SelectItem value="status-5">Status 5</SelectItem>
-                </SelectContent>
-              </Select>
-            </FormItem>
-          )}
-        />
-        <FormField
-          name="name"
-          control={form.control}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Name</FormLabel>
-              <FormControl>
-                <Input
-                  disabled={isSubmitting || disabled}
-                  placeholder="Enter alert name"
-                  {...field}
-                />
-              </FormControl>
-            </FormItem>
-          )}
-        />
-        <FormField
-          name="to"
-          control={form.control}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Receiver</FormLabel>
-              <Select
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-                disabled={isSubmitting || disabled}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a receiver" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="Customer">Customer</SelectItem>
-                  <SelectItem value="Receiver">Receiver</SelectItem>
-                </SelectContent>
-              </Select>
-            </FormItem>
-          )}
-        />
         <FormField
           name="time"
           control={form.control}
@@ -255,6 +189,50 @@ export const AlertForm = ({
             />
           </div>
         )}
+        <FormField
+          control={form.control}
+          name="alertId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Alert</FormLabel>
+              <FormControl>
+                <Combobox
+                  options={alertOptions}
+                  value={field.value}
+                  onChange={field.onChange}
+                  disabled={isSubmitting || disabled}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+        <FormField
+          name="status"
+          control={form.control}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Status</FormLabel>
+              <Select
+                onValueChange={field.onChange}
+                defaultValue={field.value}
+                disabled={isSubmitting || disabled}
+              >
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a status" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="status-1">Status 1</SelectItem>
+                  <SelectItem value="status-2">Status 2</SelectItem>
+                  <SelectItem value="status-3">Status 3</SelectItem>
+                  <SelectItem value="status-4">Status 4</SelectItem>
+                  <SelectItem value="status-5">Status 5</SelectItem>
+                </SelectContent>
+              </Select>
+            </FormItem>
+          )}
+        />
         <FormField
           control={form.control}
           name="templateId"

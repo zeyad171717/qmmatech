@@ -18,6 +18,45 @@ import {
 } from "@/db/schema";
 
 const app = new Hono()
+  .get("/", clerkMiddleware(), async (c) => {
+    const auth = getAuth(c);
+
+    if (!auth?.userId) {
+      return c.json(
+        {
+          error: "Unauthorized",
+        },
+        401
+      );
+    }
+
+    const data = await db
+      .select({
+        id: errorMessages.id,
+        name: errorMessages.name,
+        status: errorMessages.status,
+        bodyMessage: errorMessages.bodyMessage,
+        bodyEnding: errorMessages.bodyEnding,
+        header: errorMessages.header,
+        headerType: errorMessages.headerType,
+        headerText: errorMessages.headerText,
+        footer: errorMessages.footer,
+        footerText: errorMessages.footerText,
+      })
+      .from(errorMessages)
+      .where(eq(errorMessages.userId, auth.userId));
+
+    if (!data) {
+      return c.json(
+        {
+          error: "Not found",
+        },
+        404
+      );
+    }
+
+    return c.json({ data });
+  })
   .get(
     "/:id",
     zValidator("param", z.object({ id: z.string().optional() })),
@@ -58,7 +97,9 @@ const app = new Hono()
           footerText: errorMessages.footerText,
         })
         .from(errorMessages)
-        .where(and(eq(errorMessages.userId, auth.userId), eq(errorMessages.id, id)));
+        .where(
+          and(eq(errorMessages.userId, auth.userId), eq(errorMessages.id, id))
+        );
 
       if (!data) {
         return c.json(
@@ -112,15 +153,17 @@ const app = new Hono()
         );
       }
 
-      const templatesToUpdate = db.$with("templates_to_update").as(
+      const errorMessagesToUpdate = db.$with("error_messages_to_update").as(
         db
           .select({ id: errorMessages.id })
           .from(errorMessages)
-          .where(and(eq(errorMessages.id, id), eq(errorMessages.userId, auth.userId)))
+          .where(
+            and(eq(errorMessages.id, id), eq(errorMessages.userId, auth.userId))
+          )
       );
 
       const data = await db
-        .with(templatesToUpdate)
+        .with(errorMessagesToUpdate)
         .update(errorMessages)
         .set({
           name: values.name,
@@ -132,7 +175,12 @@ const app = new Hono()
           footer: values.footer,
           footerText: values.footerText,
         })
-        .where(inArray(errorMessages.id, sql`(select id from ${templatesToUpdate})`))
+        .where(
+          inArray(
+            errorMessages.id,
+            sql`(select id from ${errorMessagesToUpdate})`
+          )
+        )
         .returning({
           id: errorMessages.id,
         });
@@ -148,6 +196,6 @@ const app = new Hono()
 
       return c.json({ data });
     }
-  )
+  );
 
 export default app;

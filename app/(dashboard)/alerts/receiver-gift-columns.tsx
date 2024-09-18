@@ -7,13 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { InferResponseType } from "hono";
 import { client } from "@/lib/hono";
-import { Actions } from "./actions";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
-import { formatDate } from "@/lib/utils";
+import { describeRange, formatDate } from "@/lib/utils";
+import { Actions } from "./receiver-gift-actions";
 
 export type ResponseType = InferResponseType<
-  typeof client.api.alerts.$get,
+  (typeof client.api.alerts)["receiver-gift"]["$get"],
   200
 >["data"][0];
 
@@ -33,42 +33,70 @@ export const columns: ColumnDef<ResponseType>[] = [
     },
   },
   {
-    accessorKey: "name",
+    accessorKey: "alert",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Name
+          Alert
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
   },
   {
-    accessorKey: "template",
+    accessorKey: "messageAfterFirstButton",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Template
+          Message After First Button
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
   },
   {
-    accessorKey: "to",
+    accessorKey: "messageAfterSecondButton",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Receiver
+          Message After Second Button
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+  },
+  {
+    accessorKey: "errorMessage",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Error message
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+  },
+  {
+    accessorKey: "statusErrorMessage",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Status error message
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );

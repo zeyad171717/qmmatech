@@ -23,6 +23,21 @@ import { EditInteractiveWordSheet } from "@/features/interactive-words/component
 import { NewAlertSheet } from "@/features/alerts/components/new-alert-sheet";
 import { EditAlertSheet } from "@/features/alerts/components/edit-alert-sheet";
 
+import { NewAbandantCartSheet } from "@/features/alerts/components/new-abandant-cart-sheet";
+import { EditAbandantCartSheet } from "@/features/alerts/components/edit-abandant-cart-sheet";
+
+import { NewReceiverGiftSheet } from "@/features/alerts/components/new-receiver-gift-sheet";
+import { EditReceiverGiftSheet } from "@/features/alerts/components/edit-receiver-gift-sheet";
+
+import { NewPayOnReceiveSheet } from "@/features/alerts/components/new-pay-on-receive-sheet";
+import { EditPayOnReceiveSheet } from "@/features/alerts/components/edit-pay-on-receive-sheet";
+
+import { NewBankTransferSheet } from "@/features/alerts/components/new-bank-transfer-sheet";
+import { EditBankTransferSheet } from "@/features/alerts/components/edit-bank-transfer-sheet";
+
+import { NewNewLoginSheet } from "@/features/alerts/components/new-new-login-sheet";
+import { EditNewLoginSheet } from "@/features/alerts/components/edit-new-login-sheet";
+
 import { useMountedState } from "react-use";
 
 export const SheetProvider = () => {
@@ -56,6 +71,21 @@ export const SheetProvider = () => {
 
       <NewAlertSheet />
       <EditAlertSheet />
+
+      <NewAbandantCartSheet />
+      <EditAbandantCartSheet />
+
+      <NewReceiverGiftSheet />
+      <EditReceiverGiftSheet />
+
+      <NewPayOnReceiveSheet />
+      <EditPayOnReceiveSheet />
+
+      <NewBankTransferSheet />
+      <EditBankTransferSheet />
+
+      <NewNewLoginSheet />
+      <EditNewLoginSheet />
     </>
   );
 };
