@@ -1,5 +1,5 @@
 import { db } from "@/db/drizzle";
-import { clerkMiddleware, getAuth } from "@hono/clerk-auth";
+
 import { zValidator } from "@hono/zod-validator";
 import { createId } from "@paralleldrive/cuid2";
 import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
@@ -18,18 +18,7 @@ import {
 } from "@/db/schema";
 
 const app = new Hono()
-  .get("/", clerkMiddleware(), async (c) => {
-    const auth = getAuth(c);
-
-    if (!auth?.userId) {
-      return c.json(
-        {
-          error: "Unauthorized",
-        },
-        401
-      );
-    }
-
+  .get("/", async (c) => {
     const data = await db
       .select({
         id: errorMessages.id,
@@ -43,8 +32,7 @@ const app = new Hono()
         footer: errorMessages.footer,
         footerText: errorMessages.footerText,
       })
-      .from(errorMessages)
-      .where(eq(errorMessages.userId, auth.userId));
+      .from(errorMessages);
 
     if (!data) {
       return c.json(
@@ -60,9 +48,7 @@ const app = new Hono()
   .get(
     "/:id",
     zValidator("param", z.object({ id: z.string().optional() })),
-    clerkMiddleware(),
     async (c) => {
-      const auth = getAuth(c);
       const { id } = c.req.valid("param");
 
       if (!id) {
@@ -71,15 +57,6 @@ const app = new Hono()
             error: "Missing id",
           },
           400
-        );
-      }
-
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
         );
       }
 
@@ -97,9 +74,7 @@ const app = new Hono()
           footerText: errorMessages.footerText,
         })
         .from(errorMessages)
-        .where(
-          and(eq(errorMessages.userId, auth.userId), eq(errorMessages.id, id))
-        );
+        .where(eq(errorMessages.id, id));
 
       if (!data) {
         return c.json(
@@ -115,7 +90,6 @@ const app = new Hono()
   )
   .patch(
     "/:id",
-    clerkMiddleware(),
     zValidator("param", z.object({ id: z.string().optional() })),
     zValidator(
       "json",
@@ -131,7 +105,6 @@ const app = new Hono()
       })
     ),
     async (c) => {
-      const auth = getAuth(c);
       const { id } = c.req.valid("param");
       const values = c.req.valid("json");
 
@@ -144,22 +117,11 @@ const app = new Hono()
         );
       }
 
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
-        );
-      }
-
       const errorMessagesToUpdate = db.$with("error_messages_to_update").as(
         db
           .select({ id: errorMessages.id })
           .from(errorMessages)
-          .where(
-            and(eq(errorMessages.id, id), eq(errorMessages.userId, auth.userId))
-          )
+          .where(and(eq(errorMessages.id, id)))
       );
 
       const data = await db

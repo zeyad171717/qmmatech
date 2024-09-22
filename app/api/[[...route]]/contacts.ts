@@ -3,7 +3,7 @@ import { Hono } from "hono";
 import { db } from "@/db/drizzle";
 import { contacts, insertContactSchema } from "@/db/schema";
 import { zValidator } from "@hono/zod-validator";
-import { clerkMiddleware, getAuth } from "@hono/clerk-auth";
+
 import { and, eq, inArray } from "drizzle-orm";
 import { createId } from "@paralleldrive/cuid2";
 import { z } from "zod";
@@ -17,25 +17,11 @@ const app = new Hono()
         filterKey: z.string().optional(),
       })
     ),
-    clerkMiddleware(),
     async (c) => {
-      const auth = getAuth(c);
       const { filterKey } = c.req.valid("query");
 
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
-        );
-      }
-
       if (!filterKey) {
-        const data = await db
-          .select()
-          .from(contacts)
-          .where(eq(contacts.userId, auth.userId));
+        const data = await db.select().from(contacts);
 
         return c.json({ data });
       }
@@ -45,11 +31,8 @@ const app = new Hono()
         .from(contacts)
         // @ts-ignore
         .where(
-          and(
-            eq(contacts.userId, auth.userId),
-            // @ts-ignore
-            eq(contacts[filterKey], true)
-          )
+          // @ts-ignore
+          eq(contacts[filterKey], true)
         );
 
       return c.json({ data });
@@ -58,9 +41,7 @@ const app = new Hono()
   .get(
     "/:id",
     zValidator("param", z.object({ id: z.string().optional() })),
-    clerkMiddleware(),
     async (c) => {
-      const auth = getAuth(c);
       const { id } = c.req.valid("param");
 
       if (!id) {
@@ -72,19 +53,10 @@ const app = new Hono()
         );
       }
 
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
-        );
-      }
-
       const [data] = await db
         .select()
         .from(contacts)
-        .where(and(eq(contacts.userId, auth.userId), eq(contacts.id, id)));
+        .where(eq(contacts.id, id));
 
       if (!data) {
         return c.json(
@@ -100,24 +72,13 @@ const app = new Hono()
   )
   .post(
     "/",
-    clerkMiddleware(),
-    zValidator("json", insertContactSchema.omit({ userId: true, id: true })),
+    zValidator("json", insertContactSchema.omit({ id: true })),
     async (c) => {
-      const auth = getAuth(c);
       const values = c.req.valid("json");
-
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
-        );
-      }
 
       const [data] = await db
         .insert(contacts)
-        .values({ id: createId(), userId: auth.userId, ...values })
+        .values({ id: createId(), ...values })
         .returning();
 
       return c.json({ data });
@@ -125,30 +86,15 @@ const app = new Hono()
   )
   .post(
     "/bulk-create",
-    clerkMiddleware(),
-    zValidator(
-      "json",
-      z.array(insertContactSchema.omit({ id: true, userId: true }))
-    ),
+    zValidator("json", z.array(insertContactSchema.omit({ id: true }))),
     async (c) => {
-      const auth = getAuth(c);
       const values = c.req.valid("json");
-
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
-        );
-      }
 
       const data = await db
         .insert(contacts)
         .values(
           values.map((value) => ({
             id: createId(),
-            userId: auth.userId,
             ...value,
           }))
         )
@@ -159,7 +105,6 @@ const app = new Hono()
   )
   .post(
     "/bulk-delete",
-    clerkMiddleware(),
     zValidator(
       "json",
       z.object({
@@ -167,26 +112,11 @@ const app = new Hono()
       })
     ),
     async (c) => {
-      const auth = getAuth(c);
       const values = c.req.valid("json");
-
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
-        );
-      }
 
       const data = await db
         .delete(contacts)
-        .where(
-          and(
-            eq(contacts.userId, auth.userId),
-            inArray(contacts.id, values.ids)
-          )
-        )
+        .where(inArray(contacts.id, values.ids))
         .returning({
           id: contacts.id,
         });
@@ -196,11 +126,9 @@ const app = new Hono()
   )
   .patch(
     "/:id",
-    clerkMiddleware(),
     zValidator("param", z.object({ id: z.string().optional() })),
-    zValidator("json", insertContactSchema.omit({ userId: true, id: true })),
+    zValidator("json", insertContactSchema.omit({ id: true })),
     async (c) => {
-      const auth = getAuth(c);
       const { id } = c.req.valid("param");
       const values = c.req.valid("json");
 
@@ -213,19 +141,10 @@ const app = new Hono()
         );
       }
 
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
-        );
-      }
-
       const [data] = await db
         .update(contacts)
         .set(values)
-        .where(and(eq(contacts.userId, auth.userId), eq(contacts.id, id)))
+        .where(eq(contacts.id, id))
         .returning();
 
       if (!data) {
@@ -242,10 +161,8 @@ const app = new Hono()
   )
   .delete(
     "/:id",
-    clerkMiddleware(),
     zValidator("param", z.object({ id: z.string().optional() })),
     async (c) => {
-      const auth = getAuth(c);
       const { id } = c.req.valid("param");
 
       if (!id) {
@@ -257,18 +174,9 @@ const app = new Hono()
         );
       }
 
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
-        );
-      }
-
       const [data] = await db
         .delete(contacts)
-        .where(and(eq(contacts.userId, auth.userId), eq(contacts.id, id)))
+        .where(eq(contacts.id, id))
         .returning({
           id: contacts.id,
         });

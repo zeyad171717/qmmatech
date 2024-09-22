@@ -38,6 +38,21 @@ import { EditBankTransferSheet } from "@/features/alerts/components/edit-bank-tr
 import { NewNewLoginSheet } from "@/features/alerts/components/new-new-login-sheet";
 import { EditNewLoginSheet } from "@/features/alerts/components/edit-new-login-sheet";
 
+import { NewUserSheet } from "@/features/users/components/new-user-sheet";
+import { EditUserSheet } from "@/features/users/components/edit-user-sheet";
+
+import { NewTeamSheet } from "@/features/teams/components/new-team-sheet";
+import { EditTeamSheet } from "@/features/teams/components/edit-team-sheet";
+
+import { NewRoleSheet } from "@/features/roles/components/new-role-sheet";
+import { EditRoleSheet } from "@/features/roles/components/edit-role-sheet";
+
+import { NewPermissionSheet } from "@/features/permissions/components/new-permission-sheet";
+import { EditPermissionSheet } from "@/features/permissions/components/edit-permission-sheet";
+
+import { NewOrganizationSheet } from "@/features/organizations/components/new-organization-sheet";
+import { EditOrganizationSheet } from "@/features/organizations/components/edit-organization-sheet";
+
 import { useMountedState } from "react-use";
 
 export const SheetProvider = () => {
@@ -86,6 +101,21 @@ export const SheetProvider = () => {
 
       <NewNewLoginSheet />
       <EditNewLoginSheet />
+
+      <NewUserSheet />
+      <EditUserSheet />
+
+      <NewTeamSheet />
+      <EditTeamSheet />
+
+      <NewRoleSheet />
+      <EditRoleSheet />
+
+      <NewPermissionSheet />
+      <EditPermissionSheet />
+
+      <NewOrganizationSheet />
+      <EditOrganizationSheet />
     </>
   );
 };

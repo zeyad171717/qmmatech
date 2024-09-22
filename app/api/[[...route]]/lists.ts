@@ -1,5 +1,5 @@
 import { db } from "@/db/drizzle";
-import { clerkMiddleware, getAuth } from "@hono/clerk-auth";
+
 import { zValidator } from "@hono/zod-validator";
 import { createId } from "@paralleldrive/cuid2";
 import { and, desc, eq, inArray, sql } from "drizzle-orm";
@@ -11,7 +11,6 @@ import { campaigns, insertListSchema, lists } from "@/db/schema";
 const app = new Hono()
   .get(
     "/",
-    clerkMiddleware(),
     zValidator(
       "query",
       z.object({
@@ -19,17 +18,7 @@ const app = new Hono()
       })
     ),
     async (c) => {
-      const auth = getAuth(c);
       const { campaignId } = c.req.valid("query");
-
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
-        );
-      }
 
       const data = await db
         .select({
@@ -45,7 +34,6 @@ const app = new Hono()
         .where(
           and(
             campaignId ? eq(lists.campaignId, campaignId) : undefined,
-            eq(campaigns.userId, auth.userId),
             eq(lists.recordStatus, "created")
           )
         )
@@ -56,7 +44,6 @@ const app = new Hono()
   )
   .get(
     "/archived",
-    clerkMiddleware(),
     zValidator(
       "query",
       z.object({
@@ -64,17 +51,7 @@ const app = new Hono()
       })
     ),
     async (c) => {
-      const auth = getAuth(c);
       const { campaignId } = c.req.valid("query");
-
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
-        );
-      }
 
       const data = await db
         .select({
@@ -90,7 +67,6 @@ const app = new Hono()
         .where(
           and(
             campaignId ? eq(lists.campaignId, campaignId) : undefined,
-            eq(campaigns.userId, auth.userId),
             eq(lists.recordStatus, "archived")
           )
         )
@@ -102,9 +78,7 @@ const app = new Hono()
   .get(
     "/:id",
     zValidator("param", z.object({ id: z.string().optional() })),
-    clerkMiddleware(),
     async (c) => {
-      const auth = getAuth(c);
       const { id } = c.req.valid("param");
 
       if (!id) {
@@ -113,15 +87,6 @@ const app = new Hono()
             error: "Missing id",
           },
           400
-        );
-      }
-
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
         );
       }
 
@@ -135,7 +100,7 @@ const app = new Hono()
         })
         .from(lists)
         .innerJoin(campaigns, eq(lists.campaignId, campaigns.id))
-        .where(and(eq(campaigns.userId, auth.userId), eq(lists.id, id)));
+        .where(eq(lists.id, id));
 
       if (!data) {
         return c.json(
@@ -151,7 +116,6 @@ const app = new Hono()
   )
   .post(
     "/",
-    clerkMiddleware(),
     zValidator(
       "json",
       z.object({
@@ -167,17 +131,7 @@ const app = new Hono()
       })
     ),
     async (c) => {
-      const auth = getAuth(c);
       const values = c.req.valid("json");
-
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
-        );
-      }
 
       const [data] = await db
         .insert(lists)
@@ -189,7 +143,6 @@ const app = new Hono()
   )
   .post(
     "/bulk-delete",
-    clerkMiddleware(),
     zValidator(
       "json",
       z.object({
@@ -197,30 +150,17 @@ const app = new Hono()
       })
     ),
     async (c) => {
-      const auth = getAuth(c);
       const values = c.req.valid("json");
 
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
+      const listsToDelete = db
+        .$with("lists_to_delete")
+        .as(
+          db
+            .select({ id: lists.id })
+            .from(lists)
+            .innerJoin(campaigns, eq(lists.campaignId, campaigns.id))
+            .where(inArray(lists.id, values.ids))
         );
-      }
-
-      const listsToDelete = db.$with("lists_to_delete").as(
-        db
-          .select({ id: lists.id })
-          .from(lists)
-          .innerJoin(campaigns, eq(lists.campaignId, campaigns.id))
-          .where(
-            and(
-              inArray(lists.id, values.ids),
-              eq(campaigns.userId, auth.userId)
-            )
-          )
-      );
 
       const data = await db
         .with(listsToDelete)
@@ -236,11 +176,9 @@ const app = new Hono()
   )
   .patch(
     "/:id",
-    clerkMiddleware(),
     zValidator("param", z.object({ id: z.string().optional() })),
     zValidator("json", insertListSchema.pick({ name: true })),
     async (c) => {
-      const auth = getAuth(c);
       const { id } = c.req.valid("param");
       const values = c.req.valid("json");
 
@@ -253,21 +191,12 @@ const app = new Hono()
         );
       }
 
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
-        );
-      }
-
       const listsToUpdate = db.$with("lists_to_update").as(
         db
           .select({ id: lists.id })
           .from(lists)
           .innerJoin(campaigns, eq(lists.campaignId, campaigns.id))
-          .where(and(eq(lists.id, id), eq(campaigns.userId, auth.userId)))
+          .where(and(eq(lists.id, id)))
       );
 
       const [data] = await db
@@ -291,10 +220,8 @@ const app = new Hono()
   )
   .delete(
     "/:id",
-    clerkMiddleware(),
     zValidator("param", z.object({ id: z.string().optional() })),
     async (c) => {
-      const auth = getAuth(c);
       const { id } = c.req.valid("param");
 
       if (!id) {
@@ -306,21 +233,12 @@ const app = new Hono()
         );
       }
 
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
-        );
-      }
-
       const listsToDelete = db.$with("lists_to_delete").as(
         db
           .select({ id: lists.id })
           .from(lists)
           .innerJoin(campaigns, eq(lists.campaignId, campaigns.id))
-          .where(and(eq(lists.id, id), eq(campaigns.userId, auth.userId)))
+          .where(and(eq(lists.id, id)))
       );
 
       const [data] = await db
@@ -346,10 +264,8 @@ const app = new Hono()
   )
   .delete(
     "/archive/:id",
-    clerkMiddleware(),
     zValidator("param", z.object({ id: z.string().optional() })),
     async (c) => {
-      const auth = getAuth(c);
       const { id } = c.req.valid("param");
 
       if (!id) {
@@ -361,21 +277,12 @@ const app = new Hono()
         );
       }
 
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
-        );
-      }
-
       const listsToArchive = db.$with("lists_to_archive").as(
         db
           .select({ id: lists.id })
           .from(lists)
           .innerJoin(campaigns, eq(lists.campaignId, campaigns.id))
-          .where(and(eq(lists.id, id), eq(campaigns.userId, auth.userId)))
+          .where(and(eq(lists.id, id)))
       );
 
       const [data] = await db
@@ -401,10 +308,8 @@ const app = new Hono()
   )
   .delete(
     "/stop/:id",
-    clerkMiddleware(),
     zValidator("param", z.object({ id: z.string().optional() })),
     async (c) => {
-      const auth = getAuth(c);
       const { id } = c.req.valid("param");
 
       if (!id) {
@@ -416,21 +321,12 @@ const app = new Hono()
         );
       }
 
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
-        );
-      }
-
       const listsToStop = db.$with("lists_to_stop").as(
         db
           .select({ id: lists.id })
           .from(lists)
           .innerJoin(campaigns, eq(lists.campaignId, campaigns.id))
-          .where(and(eq(lists.id, id), eq(campaigns.userId, auth.userId)))
+          .where(and(eq(lists.id, id)))
       );
 
       const [data] = await db
@@ -456,10 +352,8 @@ const app = new Hono()
   )
   .delete(
     "/restore/:id",
-    clerkMiddleware(),
     zValidator("param", z.object({ id: z.string().optional() })),
     async (c) => {
-      const auth = getAuth(c);
       const { id } = c.req.valid("param");
 
       if (!id) {
@@ -471,21 +365,12 @@ const app = new Hono()
         );
       }
 
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
-        );
-      }
-
       const listsToRestore = db.$with("lists_to_restore").as(
         db
           .select({ id: lists.id })
           .from(lists)
           .innerJoin(campaigns, eq(lists.campaignId, campaigns.id))
-          .where(and(eq(lists.id, id), eq(campaigns.userId, auth.userId)))
+          .where(and(eq(lists.id, id)))
       );
 
       const [data] = await db

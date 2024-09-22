@@ -11,6 +11,11 @@ import interactiveWords from "./interactive-words";
 import bots from "./bots";
 import nodes from "./nodes";
 import alerts from "./alerts";
+import permissions from "./permissions";
+import roles from "./roles";
+import organizations from "./organizations";
+import users from "./users";
+import teams from "./teams";
 
 export const runtime = "edge";
 
@@ -28,6 +33,11 @@ const routes = app
   .route("/bots", bots)
   .route("/nodes", nodes)
   .route("/alerts", alerts)
+  .route("/permissions", permissions)
+  .route("/roles", roles)
+  .route("/organizations", organizations)
+  .route("/users", users)
+  .route("/teams", teams);
 
 export const GET = handle(app);
 export const POST = handle(app);

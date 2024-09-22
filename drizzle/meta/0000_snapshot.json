@@ -1,5 +1,5 @@
 {
-  "id": "1de08061-625d-4a0a-becf-3cfadaa1b89b",
+  "id": "dc5e4e83-e3b5-41e6-b691-df7bf56bd9a2",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
@@ -14,9 +14,9 @@
           "primaryKey": true,
           "notNull": true
         },
-        "user_id": {
-          "name": "user_id",
-          "type": "text",
+        "sr": {
+          "name": "sr",
+          "type": "serial",
           "primaryKey": false,
           "notNull": true
         },
@@ -103,9 +103,9 @@
           "primaryKey": true,
           "notNull": true
         },
-        "user_id": {
-          "name": "user_id",
-          "type": "text",
+        "sr": {
+          "name": "sr",
+          "type": "serial",
           "primaryKey": false,
           "notNull": true
         },
@@ -180,9 +180,9 @@
           "primaryKey": true,
           "notNull": true
         },
-        "user_id": {
-          "name": "user_id",
-          "type": "text",
+        "sr": {
+          "name": "sr",
+          "type": "serial",
           "primaryKey": false,
           "notNull": true
         },
@@ -215,6 +215,30 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "scheduledDays": {
+          "name": "scheduledDays",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "scheduledHours": {
+          "name": "scheduledHours",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "scheduledMinutes": {
+          "name": "scheduledMinutes",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "time": {
+          "name": "time",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
         }
       },
       "indexes": {},
@@ -230,12 +254,6 @@
           "name": "id",
           "type": "text",
           "primaryKey": true,
-          "notNull": true
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "text",
-          "primaryKey": false,
           "notNull": true
         },
         "name": {
@@ -270,12 +288,6 @@
           "name": "id",
           "type": "text",
           "primaryKey": true,
-          "notNull": true
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "text",
-          "primaryKey": false,
           "notNull": true
         },
         "name": {
@@ -317,8 +329,8 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "contacts": {
-      "name": "contacts",
+    "channels": {
+      "name": "channels",
       "schema": "",
       "columns": {
         "id": {
@@ -327,10 +339,39 @@
           "primaryKey": true,
           "notNull": true
         },
-        "user_id": {
-          "name": "user_id",
+        "orgId": {
+          "name": "orgId",
           "type": "text",
           "primaryKey": false,
+          "notNull": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "recordStatus": {
+          "name": "recordStatus",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'created'"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "contacts": {
+      "name": "contacts",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
           "notNull": true
         },
         "phone": {
@@ -399,12 +440,6 @@
           "name": "id",
           "type": "text",
           "primaryKey": true,
-          "notNull": true
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "text",
-          "primaryKey": false,
           "notNull": true
         },
         "name": {
@@ -492,12 +527,6 @@
           "primaryKey": true,
           "notNull": true
         },
-        "user_id": {
-          "name": "user_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
         "word": {
           "name": "word",
           "type": "text",
@@ -563,12 +592,6 @@
           "name": "id",
           "type": "text",
           "primaryKey": true,
-          "notNull": true
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "text",
-          "primaryKey": false,
           "notNull": true
         },
         "name": {
@@ -792,12 +815,6 @@
           "primaryKey": true,
           "notNull": true
         },
-        "user_id": {
-          "name": "user_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
         "name": {
           "name": "name",
           "type": "text",
@@ -883,9 +900,9 @@
           "primaryKey": true,
           "notNull": true
         },
-        "user_id": {
-          "name": "user_id",
-          "type": "text",
+        "sr": {
+          "name": "sr",
+          "type": "serial",
           "primaryKey": false,
           "notNull": true
         },
@@ -906,6 +923,30 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "scheduledDays": {
+          "name": "scheduledDays",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "scheduledHours": {
+          "name": "scheduledHours",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "scheduledMinutes": {
+          "name": "scheduledMinutes",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "time": {
+          "name": "time",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
         }
       },
       "indexes": {},
@@ -921,12 +962,6 @@
           "name": "id",
           "type": "text",
           "primaryKey": true,
-          "notNull": true
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "text",
-          "primaryKey": false,
           "notNull": true
         },
         "name": {
@@ -971,6 +1006,53 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
+    "organizations": {
+      "name": "organizations",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "country": {
+          "name": "country",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "city": {
+          "name": "city",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "phone": {
+          "name": "phone",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "recordStatus": {
+          "name": "recordStatus",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'created'"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
     "payOnReceive": {
       "name": "payOnReceive",
       "schema": "",
@@ -981,9 +1063,9 @@
           "primaryKey": true,
           "notNull": true
         },
-        "user_id": {
-          "name": "user_id",
-          "type": "text",
+        "sr": {
+          "name": "sr",
+          "type": "serial",
           "primaryKey": false,
           "notNull": true
         },
@@ -1028,6 +1110,65 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "scheduledDays": {
+          "name": "scheduledDays",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "scheduledHours": {
+          "name": "scheduledHours",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "scheduledMinutes": {
+          "name": "scheduledMinutes",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "time": {
+          "name": "time",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "permissions": {
+      "name": "permissions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "recordStatus": {
+          "name": "recordStatus",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'created'"
         }
       },
       "indexes": {},
@@ -1045,9 +1186,9 @@
           "primaryKey": true,
           "notNull": true
         },
-        "user_id": {
-          "name": "user_id",
-          "type": "text",
+        "sr": {
+          "name": "sr",
+          "type": "serial",
           "primaryKey": false,
           "notNull": true
         },
@@ -1080,6 +1221,100 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "scheduledDays": {
+          "name": "scheduledDays",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "scheduledHours": {
+          "name": "scheduledHours",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "scheduledMinutes": {
+          "name": "scheduledMinutes",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "time": {
+          "name": "time",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "roles": {
+      "name": "roles",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "recordStatus": {
+          "name": "recordStatus",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'created'"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "teams": {
+      "name": "teams",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "orgId": {
+          "name": "orgId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "recordStatus": {
+          "name": "recordStatus",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'created'"
         }
       },
       "indexes": {},
@@ -1303,12 +1538,6 @@
           "primaryKey": true,
           "notNull": true
         },
-        "user_id": {
-          "name": "user_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
         "name": {
           "name": "name",
           "type": "text",
@@ -1377,6 +1606,83 @@
           "primaryKey": false,
           "notNull": true,
           "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "users": {
+      "name": "users",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "orgId": {
+          "name": "orgId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "roleId": {
+          "name": "roleId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "username": {
+          "name": "username",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "imgUrl": {
+          "name": "imgUrl",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "language": {
+          "name": "language",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "password": {
+          "name": "password",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "phoneNumber": {
+          "name": "phoneNumber",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "recordStatus": {
+          "name": "recordStatus",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'created'"
         }
       },
       "indexes": {},

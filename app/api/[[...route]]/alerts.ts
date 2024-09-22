@@ -10,7 +10,7 @@ import {
   errorMessages,
   payOnReceive,
 } from "@/db/schema";
-import { clerkMiddleware, getAuth } from "@hono/clerk-auth";
+
 import { zValidator } from "@hono/zod-validator";
 import { createId } from "@paralleldrive/cuid2";
 import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
@@ -18,18 +18,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 
 const app = new Hono()
-  .get("/", clerkMiddleware(), async (c) => {
-    const auth = getAuth(c);
-
-    if (!auth?.userId) {
-      return c.json(
-        {
-          error: "Unauthorized",
-        },
-        401
-      );
-    }
-
+  .get("/", async (c) => {
     const data = await db
       .select({
         id: alerts.id,
@@ -45,23 +34,11 @@ const app = new Hono()
         scheduledMinutes: alerts.scheduledMinutes,
       })
       .from(alerts)
-      .innerJoin(templates, eq(alerts.templateId, templates.id))
-      .where(eq(alerts.userId, auth.userId));
+      .innerJoin(templates, eq(alerts.templateId, templates.id));
 
     return c.json({ data });
   })
-  .get("/abandant-carts", clerkMiddleware(), async (c) => {
-    const auth = getAuth(c);
-
-    if (!auth?.userId) {
-      return c.json(
-        {
-          error: "Unauthorized",
-        },
-        401
-      );
-    }
-
+  .get("/abandant-carts", async (c) => {
     const data = await db
       .select({
         id: abundantCarts.id,
@@ -79,23 +56,11 @@ const app = new Hono()
         maxCartValue: abundantCarts.maxCartValue,
       })
       .from(abundantCarts)
-      .innerJoin(templates, eq(abundantCarts.templateId, templates.id))
-      .where(eq(abundantCarts.userId, auth.userId));
+      .innerJoin(templates, eq(abundantCarts.templateId, templates.id));
 
     return c.json({ data });
   })
-  .get("/receiver-gift", clerkMiddleware(), async (c) => {
-    const auth = getAuth(c);
-
-    if (!auth?.userId) {
-      return c.json(
-        {
-          error: "Unauthorized",
-        },
-        401
-      );
-    }
-
+  .get("/receiver-gift", async (c) => {
     const data = await db
       .select({
         id: receiverGift.id,
@@ -127,23 +92,11 @@ const app = new Hono()
       .innerJoin(
         errorMessages,
         eq(receiverGift.statusErrorMessageId, errorMessages.id)
-      )
-      .where(eq(receiverGift.userId, auth.userId));
+      );
 
     return c.json({ data });
   })
-  .get("/pay-on-receive", clerkMiddleware(), async (c) => {
-    const auth = getAuth(c);
-
-    if (!auth?.userId) {
-      return c.json(
-        {
-          error: "Unauthorized",
-        },
-        401
-      );
-    }
-
+  .get("/pay-on-receive", async (c) => {
     const data = await db
       .select({
         id: payOnReceive.id,
@@ -177,23 +130,11 @@ const app = new Hono()
       .innerJoin(
         errorMessages,
         eq(payOnReceive.statusErrorMessageId, errorMessages.id)
-      )
-      .where(eq(payOnReceive.userId, auth.userId));
+      );
 
     return c.json({ data });
   })
-  .get("/bank-transfer", clerkMiddleware(), async (c) => {
-    const auth = getAuth(c);
-
-    if (!auth?.userId) {
-      return c.json(
-        {
-          error: "Unauthorized",
-        },
-        401
-      );
-    }
-
+  .get("/bank-transfer", async (c) => {
     const data = await db
       .select({
         id: bankTransfer.id,
@@ -225,23 +166,11 @@ const app = new Hono()
       .innerJoin(
         errorMessages,
         eq(bankTransfer.statusErrorMessageId, errorMessages.id)
-      )
-      .where(eq(bankTransfer.userId, auth.userId));
+      );
 
     return c.json({ data });
   })
-  .get("/new-login", clerkMiddleware(), async (c) => {
-    const auth = getAuth(c);
-
-    if (!auth?.userId) {
-      return c.json(
-        {
-          error: "Unauthorized",
-        },
-        401
-      );
-    }
-
+  .get("/new-login", async (c) => {
     const data = await db
       .select({
         id: newLogin.id,
@@ -256,17 +185,14 @@ const app = new Hono()
       })
       .from(newLogin)
       .innerJoin(templates, eq(newLogin.templateId, templates.id))
-      .innerJoin(alerts, eq(newLogin.alertId, alerts.id))
-      .where(eq(newLogin.userId, auth.userId));
+      .innerJoin(alerts, eq(newLogin.alertId, alerts.id));
 
     return c.json({ data });
   })
   .get(
     "/:id",
     zValidator("param", z.object({ id: z.string().optional() })),
-    clerkMiddleware(),
     async (c) => {
-      const auth = getAuth(c);
       const { id } = c.req.valid("param");
 
       if (!id) {
@@ -275,15 +201,6 @@ const app = new Hono()
             error: "Missing id",
           },
           400
-        );
-      }
-
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
         );
       }
 
@@ -300,7 +217,7 @@ const app = new Hono()
           scheduledMinutes: alerts.scheduledMinutes,
         })
         .from(alerts)
-        .where(and(eq(alerts.userId, auth.userId), eq(alerts.id, id)));
+        .where(eq(alerts.id, id));
 
       if (!data) {
         return c.json(
@@ -317,9 +234,7 @@ const app = new Hono()
   .get(
     "/abandant-carts/:id",
     zValidator("param", z.object({ id: z.string().optional() })),
-    clerkMiddleware(),
     async (c) => {
-      const auth = getAuth(c);
       const { id } = c.req.valid("param");
 
       if (!id) {
@@ -328,15 +243,6 @@ const app = new Hono()
             error: "Missing id",
           },
           400
-        );
-      }
-
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
         );
       }
 
@@ -356,9 +262,7 @@ const app = new Hono()
           maxCartValue: abundantCarts.maxCartValue,
         })
         .from(abundantCarts)
-        .where(
-          and(eq(abundantCarts.userId, auth.userId), eq(abundantCarts.id, id))
-        );
+        .where(eq(abundantCarts.id, id));
 
       if (!data) {
         return c.json(
@@ -375,9 +279,7 @@ const app = new Hono()
   .get(
     "/receiver-gift/:id",
     zValidator("param", z.object({ id: z.string().optional() })),
-    clerkMiddleware(),
     async (c) => {
-      const auth = getAuth(c);
       const { id } = c.req.valid("param");
 
       if (!id) {
@@ -386,15 +288,6 @@ const app = new Hono()
             error: "Missing id",
           },
           400
-        );
-      }
-
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
         );
       }
 
@@ -412,9 +305,7 @@ const app = new Hono()
           time: receiverGift.time,
         })
         .from(receiverGift)
-        .where(
-          and(eq(receiverGift.userId, auth.userId), eq(receiverGift.id, id))
-        );
+        .where(eq(receiverGift.id, id));
 
       if (!data) {
         return c.json(
@@ -431,9 +322,7 @@ const app = new Hono()
   .get(
     "/pay-on-receive/:id",
     zValidator("param", z.object({ id: z.string().optional() })),
-    clerkMiddleware(),
     async (c) => {
-      const auth = getAuth(c);
       const { id } = c.req.valid("param");
 
       if (!id) {
@@ -442,15 +331,6 @@ const app = new Hono()
             error: "Missing id",
           },
           400
-        );
-      }
-
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
         );
       }
 
@@ -470,9 +350,7 @@ const app = new Hono()
           time: payOnReceive.time,
         })
         .from(payOnReceive)
-        .where(
-          and(eq(payOnReceive.userId, auth.userId), eq(payOnReceive.id, id))
-        );
+        .where(eq(payOnReceive.id, id));
 
       if (!data) {
         return c.json(
@@ -489,9 +367,7 @@ const app = new Hono()
   .get(
     "/bank-transfer/:id",
     zValidator("param", z.object({ id: z.string().optional() })),
-    clerkMiddleware(),
     async (c) => {
-      const auth = getAuth(c);
       const { id } = c.req.valid("param");
 
       if (!id) {
@@ -500,15 +376,6 @@ const app = new Hono()
             error: "Missing id",
           },
           400
-        );
-      }
-
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
         );
       }
 
@@ -526,9 +393,7 @@ const app = new Hono()
           time: bankTransfer.time,
         })
         .from(bankTransfer)
-        .where(
-          and(eq(bankTransfer.userId, auth.userId), eq(bankTransfer.id, id))
-        );
+        .where(eq(bankTransfer.id, id));
 
       if (!data) {
         return c.json(
@@ -545,9 +410,7 @@ const app = new Hono()
   .get(
     "/new-login/:id",
     zValidator("param", z.object({ id: z.string().optional() })),
-    clerkMiddleware(),
     async (c) => {
-      const auth = getAuth(c);
       const { id } = c.req.valid("param");
 
       if (!id) {
@@ -556,15 +419,6 @@ const app = new Hono()
             error: "Missing id",
           },
           400
-        );
-      }
-
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
         );
       }
 
@@ -580,7 +434,7 @@ const app = new Hono()
           time: newLogin.time,
         })
         .from(newLogin)
-        .where(and(eq(newLogin.userId, auth.userId), eq(newLogin.id, id)));
+        .where(eq(newLogin.id, id));
 
       if (!data) {
         return c.json(
@@ -596,7 +450,6 @@ const app = new Hono()
   )
   .post(
     "/",
-    clerkMiddleware(),
     zValidator(
       "json",
       z.object({
@@ -611,23 +464,12 @@ const app = new Hono()
       })
     ),
     async (c) => {
-      const auth = getAuth(c);
       const values = c.req.valid("json");
-
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
-        );
-      }
 
       const [data] = await db
         .insert(alerts)
         .values({
           id: createId(),
-          userId: auth.userId,
           name: values.name,
           statusCode: values.statusCode,
           to: values.to,
@@ -644,7 +486,6 @@ const app = new Hono()
   )
   .post(
     "/abandant-carts",
-    clerkMiddleware(),
     zValidator(
       "json",
       z.object({
@@ -661,23 +502,12 @@ const app = new Hono()
       })
     ),
     async (c) => {
-      const auth = getAuth(c);
       const values = c.req.valid("json");
-
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
-        );
-      }
 
       const [data] = await db
         .insert(abundantCarts)
         .values({
           id: createId(),
-          userId: auth.userId,
           name: values.name,
           statusCode: values.statusCode,
           templateId: values.templateId,
@@ -696,7 +526,6 @@ const app = new Hono()
   )
   .post(
     "/receiver-gift",
-    clerkMiddleware(),
     zValidator(
       "json",
       z.object({
@@ -712,23 +541,12 @@ const app = new Hono()
       })
     ),
     async (c) => {
-      const auth = getAuth(c);
       const values = c.req.valid("json");
-
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
-        );
-      }
 
       const [data] = await db
         .insert(receiverGift)
         .values({
           id: createId(),
-          userId: auth.userId,
           alertId: values.alertId,
           messageAfterFirstButtonId: values.messageAfterFirstButtonId,
           messageAfterSecondButtonId: values.messageAfterSecondButtonId,
@@ -746,7 +564,6 @@ const app = new Hono()
   )
   .post(
     "/pay-on-receive",
-    clerkMiddleware(),
     zValidator(
       "json",
       z.object({
@@ -764,23 +581,12 @@ const app = new Hono()
       })
     ),
     async (c) => {
-      const auth = getAuth(c);
       const values = c.req.valid("json");
-
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
-        );
-      }
 
       const [data] = await db
         .insert(payOnReceive)
         .values({
           id: createId(),
-          userId: auth.userId,
           alertId: values.alertId,
           messageAfterFirstButtonId: values.messageAfterFirstButtonId,
           messageAfterSecondButtonId: values.messageAfterSecondButtonId,
@@ -800,7 +606,6 @@ const app = new Hono()
   )
   .post(
     "/bank-transfer",
-    clerkMiddleware(),
     zValidator(
       "json",
       z.object({
@@ -816,23 +621,12 @@ const app = new Hono()
       })
     ),
     async (c) => {
-      const auth = getAuth(c);
       const values = c.req.valid("json");
-
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
-        );
-      }
 
       const [data] = await db
         .insert(bankTransfer)
         .values({
           id: createId(),
-          userId: auth.userId,
           alertId: values.alertId,
           messageAfterFirstButtonId: values.messageAfterFirstButtonId,
           messageAfterSecondButtonId: values.messageAfterSecondButtonId,
@@ -850,7 +644,6 @@ const app = new Hono()
   )
   .post(
     "/new-login",
-    clerkMiddleware(),
     zValidator(
       "json",
       z.object({
@@ -864,23 +657,12 @@ const app = new Hono()
       })
     ),
     async (c) => {
-      const auth = getAuth(c);
       const values = c.req.valid("json");
-
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
-        );
-      }
 
       const [data] = await db
         .insert(newLogin)
         .values({
           id: createId(),
-          userId: auth.userId,
           templateId: values.templateId,
           status: values.status,
           alertId: values.alertId,
@@ -896,7 +678,6 @@ const app = new Hono()
   )
   .patch(
     "/:id",
-    clerkMiddleware(),
     zValidator("param", z.object({ id: z.string().optional() })),
     zValidator(
       "json",
@@ -912,7 +693,6 @@ const app = new Hono()
       })
     ),
     async (c) => {
-      const auth = getAuth(c);
       const { id } = c.req.valid("param");
       const values = c.req.valid("json");
 
@@ -925,20 +705,11 @@ const app = new Hono()
         );
       }
 
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
-        );
-      }
-
       const alertsToUpdate = db.$with("alerts_to_update").as(
         db
           .select({ id: alerts.id })
           .from(alerts)
-          .where(and(eq(alerts.id, id), eq(alerts.userId, auth.userId)))
+          .where(and(eq(alerts.id, id)))
       );
 
       const [data] = await db
@@ -973,7 +744,6 @@ const app = new Hono()
   )
   .patch(
     "/abandant-carts/:id",
-    clerkMiddleware(),
     zValidator("param", z.object({ id: z.string().optional() })),
     zValidator(
       "json",
@@ -991,7 +761,6 @@ const app = new Hono()
       })
     ),
     async (c) => {
-      const auth = getAuth(c);
       const { id } = c.req.valid("param");
       const values = c.req.valid("json");
 
@@ -1004,22 +773,11 @@ const app = new Hono()
         );
       }
 
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
-        );
-      }
-
       const abundantCartsToUpdate = db.$with("abundant_carts_to_update").as(
         db
           .select({ id: abundantCarts.id })
           .from(abundantCarts)
-          .where(
-            and(eq(abundantCarts.id, id), eq(abundantCarts.userId, auth.userId))
-          )
+          .where(and(eq(abundantCarts.id, id)))
       );
 
       const [data] = await db
@@ -1038,7 +796,10 @@ const app = new Hono()
           maxCartValue: values.maxCartValue,
         })
         .where(
-          inArray(abundantCarts.id, sql`(select id from ${abundantCartsToUpdate})`)
+          inArray(
+            abundantCarts.id,
+            sql`(select id from ${abundantCartsToUpdate})`
+          )
         )
         .returning({
           id: abundantCarts.id,
@@ -1058,7 +819,6 @@ const app = new Hono()
   )
   .patch(
     "/receiver-gift/:id",
-    clerkMiddleware(),
     zValidator("param", z.object({ id: z.string().optional() })),
     zValidator(
       "json",
@@ -1075,7 +835,6 @@ const app = new Hono()
       })
     ),
     async (c) => {
-      const auth = getAuth(c);
       const { id } = c.req.valid("param");
       const values = c.req.valid("json");
 
@@ -1088,22 +847,11 @@ const app = new Hono()
         );
       }
 
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
-        );
-      }
-
       const receiverGiftsToUpdate = db.$with("receiver_gifts_to_update").as(
         db
           .select({ id: receiverGift.id })
           .from(receiverGift)
-          .where(
-            and(eq(receiverGift.id, id), eq(receiverGift.userId, auth.userId))
-          )
+          .where(and(eq(receiverGift.id, id)))
       );
 
       const [data] = await db
@@ -1121,7 +869,10 @@ const app = new Hono()
           time: values.time,
         })
         .where(
-          inArray(receiverGift.id, sql`(select id from ${receiverGiftsToUpdate})`)
+          inArray(
+            receiverGift.id,
+            sql`(select id from ${receiverGiftsToUpdate})`
+          )
         )
         .returning({
           id: receiverGift.id,
@@ -1141,7 +892,6 @@ const app = new Hono()
   )
   .patch(
     "/pay-on-receive/:id",
-    clerkMiddleware(),
     zValidator("param", z.object({ id: z.string().optional() })),
     zValidator(
       "json",
@@ -1160,7 +910,6 @@ const app = new Hono()
       })
     ),
     async (c) => {
-      const auth = getAuth(c);
       const { id } = c.req.valid("param");
       const values = c.req.valid("json");
 
@@ -1173,22 +922,11 @@ const app = new Hono()
         );
       }
 
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
-        );
-      }
-
       const payOnReceiveToUpdate = db.$with("pay_on_receive_to_update").as(
         db
           .select({ id: receiverGift.id })
           .from(receiverGift)
-          .where(
-            and(eq(receiverGift.id, id), eq(receiverGift.userId, auth.userId))
-          )
+          .where(and(eq(receiverGift.id, id)))
       );
 
       const [data] = await db
@@ -1208,7 +946,10 @@ const app = new Hono()
           time: values.time,
         })
         .where(
-          inArray(payOnReceive.id, sql`(select id from ${payOnReceiveToUpdate})`)
+          inArray(
+            payOnReceive.id,
+            sql`(select id from ${payOnReceiveToUpdate})`
+          )
         )
         .returning({
           id: payOnReceive.id,
@@ -1228,7 +969,6 @@ const app = new Hono()
   )
   .patch(
     "/bank-transfer/:id",
-    clerkMiddleware(),
     zValidator("param", z.object({ id: z.string().optional() })),
     zValidator(
       "json",
@@ -1245,7 +985,6 @@ const app = new Hono()
       })
     ),
     async (c) => {
-      const auth = getAuth(c);
       const { id } = c.req.valid("param");
       const values = c.req.valid("json");
 
@@ -1258,22 +997,11 @@ const app = new Hono()
         );
       }
 
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
-        );
-      }
-
       const bankTransfersToUpdate = db.$with("bank_transfers_to_update").as(
         db
           .select({ id: bankTransfer.id })
           .from(bankTransfer)
-          .where(
-            and(eq(bankTransfer.id, id), eq(bankTransfer.userId, auth.userId))
-          )
+          .where(and(eq(bankTransfer.id, id)))
       );
 
       const [data] = await db
@@ -1314,7 +1042,6 @@ const app = new Hono()
   )
   .patch(
     "/new-login/:id",
-    clerkMiddleware(),
     zValidator("param", z.object({ id: z.string().optional() })),
     zValidator(
       "json",
@@ -1329,7 +1056,6 @@ const app = new Hono()
       })
     ),
     async (c) => {
-      const auth = getAuth(c);
       const { id } = c.req.valid("param");
       const values = c.req.valid("json");
 
@@ -1342,21 +1068,14 @@ const app = new Hono()
         );
       }
 
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
+      const newLoginsToUpdate = db
+        .$with("new_logins_to_update")
+        .as(
+          db
+            .select({ id: newLogin.id })
+            .from(newLogin)
+            .where(eq(newLogin.id, id))
         );
-      }
-
-      const newLoginsToUpdate = db.$with("new_logins_to_update").as(
-        db
-          .select({ id: newLogin.id })
-          .from(newLogin)
-          .where(and(eq(newLogin.id, id), eq(newLogin.userId, auth.userId)))
-      );
 
       const [data] = await db
         .with(newLoginsToUpdate)
