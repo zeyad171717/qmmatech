@@ -11,7 +11,7 @@ import { useOpenNewLogin } from "../hooks/use-open-new-login";
 import { useGetNewLogin } from "../api/use-get-new-login";
 import { useEditNewLogin } from "../api/use-edit-new-login";
 import { useGetTemplates } from "@/features/templates/api/use-get-templates";
-import { useGetAlerts } from "@/features/templates/api/use-get-templates";
+import { useGetAlerts } from "@/features/alerts/api/use-get-alerts";
 import { NewLoginForm } from "./new-login-form";
 
 const formSchema = z.object({
@@ -48,7 +48,7 @@ export const EditNewLoginSheet = () => {
 
   const isPending = editMutation.isPending;
   const isLoading =
-    alertQuery.isLoading || templatesQuery.isLoading || alertsQuery.isLoading;
+    alertsQuery.isLoading || templatesQuery.isLoading || alertsQuery.isLoading;
 
   const onSubmit = (values: FormValues) => {
     editMutation.mutate(values, {
@@ -60,7 +60,7 @@ export const EditNewLoginSheet = () => {
 
   const defaultValues = newLoginQuery.data
     ? {
-        alertId: alertQuery.data.alertId,
+        alertId: newLoginQuery.data.alertId,
         status: newLoginQuery.data.status,
         templateId: newLoginQuery.data.templateId,
         time: newLoginQuery.data.time,
@@ -79,27 +79,27 @@ export const EditNewLoginSheet = () => {
       };
 
   return (
-      <Sheet open={isOpen} onOpenChange={onClose}>
-        <SheetContent className="space-y-4">
-          <SheetHeader>
-            <SheetTitle>Edit Alert</SheetTitle>
-            <SheetDescription>Edit an existing alert</SheetDescription>
-          </SheetHeader>
-          {isLoading ? (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <Loader2 className="size-4 textMuted-foreground animate-spin" />
-            </div>
-          ) : (
-            <NewLoginForm
-              onSubmit={onSubmit}
-              disabled={isPending}
-              templateOptions={templateOptions}
-              alertOptions={alertOptions}
-              defaultValues={defaultValues}
-              id={id}
-            />
-          )}
-        </SheetContent>
-      </Sheet>
+    <Sheet open={isOpen} onOpenChange={onClose}>
+      <SheetContent className="space-y-4">
+        <SheetHeader>
+          <SheetTitle>Edit Alert</SheetTitle>
+          <SheetDescription>Edit an existing alert</SheetDescription>
+        </SheetHeader>
+        {isLoading ? (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <Loader2 className="size-4 textMuted-foreground animate-spin" />
+          </div>
+        ) : (
+          <NewLoginForm
+            onSubmit={onSubmit}
+            disabled={isPending}
+            templateOptions={templateOptions}
+            alertOptions={alertOptions}
+            defaultValues={defaultValues}
+            id={id}
+          />
+        )}
+      </SheetContent>
+    </Sheet>
   );
 };

@@ -2,13 +2,11 @@
 
 import { Button } from "@/components/ui/button";
 import { useCreateBot } from "@/features/bots/api/use-create-bot";
-import { useUser } from "@clerk/nextjs";
 import { PlusCircle } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 const ChatbotPage = () => {
-  const { user } = useUser();
   const router = useRouter();
   const create = useCreateBot();
 
@@ -34,7 +32,6 @@ const ChatbotPage = () => {
         priority
         className="h-auto"
       />
-      <h2 className="text-lg font-medium">Welcome {user?.firstName}</h2>
       <Button onClick={onCreate}>
         <PlusCircle className="mr-2 h-4 w-4" />
         Create a bot

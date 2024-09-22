@@ -1,5 +1,5 @@
 import { db } from "@/db/drizzle";
-import { clerkMiddleware, getAuth } from "@hono/clerk-auth";
+
 import { zValidator } from "@hono/zod-validator";
 import { createId } from "@paralleldrive/cuid2";
 import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
@@ -20,20 +20,9 @@ import {
 const app = new Hono()
   .get(
     "/:nodeId",
-    clerkMiddleware(),
     zValidator("param", z.object({ nodeId: z.string() })),
     async (c) => {
-      const auth = getAuth(c);
       const { nodeId } = c.req.valid("param");
-
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
-        );
-      }
 
       const data = await db
         .select({
@@ -47,7 +36,6 @@ const app = new Hono()
         .from(linkedMessages)
         .where(
           and(
-            eq(linkedMessages.userId, auth.userId),
             eq(linkedMessages.recordStatus, "created"),
             eq(linkedMessages.nodeId, nodeId)
           )
@@ -60,9 +48,7 @@ const app = new Hono()
   .get(
     "/edit/:id",
     zValidator("param", z.object({ id: z.string().optional() })),
-    clerkMiddleware(),
     async (c) => {
-      const auth = getAuth(c);
       const { id } = c.req.valid("param");
 
       if (!id) {
@@ -71,15 +57,6 @@ const app = new Hono()
             error: "Missing id",
           },
           400
-        );
-      }
-
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
         );
       }
 
@@ -99,9 +76,7 @@ const app = new Hono()
           position: linkedMessages.position,
         })
         .from(linkedMessages)
-        .where(
-          and(eq(linkedMessages.userId, auth.userId), eq(linkedMessages.id, id))
-        );
+        .where(eq(linkedMessages.id, id));
 
       if (!data) {
         return c.json(
@@ -117,7 +92,6 @@ const app = new Hono()
   )
   .post(
     "/",
-    clerkMiddleware(),
     zValidator(
       "json",
       z.object({
@@ -134,23 +108,12 @@ const app = new Hono()
       })
     ),
     async (c) => {
-      const auth = getAuth(c);
       const values = c.req.valid("json");
-
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
-        );
-      }
 
       const [data] = await db
         .insert(linkedMessages)
         .values({
           id: createId(),
-          userId: auth.userId,
           name: values.name,
           bodyMessage: values.bodyMessage,
           bodyEnding: values.bodyEnding,
@@ -171,7 +134,6 @@ const app = new Hono()
   )
   .post(
     "/bulk-delete",
-    clerkMiddleware(),
     zValidator(
       "json",
       z.object({
@@ -179,28 +141,13 @@ const app = new Hono()
       })
     ),
     async (c) => {
-      const auth = getAuth(c);
       const values = c.req.valid("json");
-
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
-        );
-      }
 
       const linkedMessagesToDelete = db.$with("linked_messages_to_delete").as(
         db
           .select({ id: linkedMessages.id })
           .from(linkedMessages)
-          .where(
-            and(
-              inArray(linkedMessages.id, values.ids),
-              eq(linkedMessages.userId, auth.userId)
-            )
-          )
+          .where(and(inArray(linkedMessages.id, values.ids)))
       );
 
       const data = await db
@@ -222,7 +169,6 @@ const app = new Hono()
   )
   .patch(
     "/:id",
-    clerkMiddleware(),
     zValidator("param", z.object({ id: z.string().optional() })),
     zValidator(
       "json",
@@ -240,7 +186,6 @@ const app = new Hono()
       })
     ),
     async (c) => {
-      const auth = getAuth(c);
       const { id } = c.req.valid("param");
       const values = c.req.valid("json");
 
@@ -253,25 +198,11 @@ const app = new Hono()
         );
       }
 
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
-        );
-      }
-
       const linkedMessagesToUpdate = db.$with("linkedMessages_to_update").as(
         db
           .select({ id: linkedMessages.id })
           .from(linkedMessages)
-          .where(
-            and(
-              eq(linkedMessages.id, id),
-              eq(linkedMessages.userId, auth.userId)
-            )
-          )
+          .where(and(eq(linkedMessages.id, id)))
       );
 
       const data = await db
@@ -313,10 +244,8 @@ const app = new Hono()
   )
   .delete(
     "/:id",
-    clerkMiddleware(),
     zValidator("param", z.object({ id: z.string().optional() })),
     async (c) => {
-      const auth = getAuth(c);
       const { id } = c.req.valid("param");
 
       if (!id) {
@@ -328,25 +257,11 @@ const app = new Hono()
         );
       }
 
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
-        );
-      }
-
       const linkedMessagesToDelete = db.$with("linked_messages_to_delete").as(
         db
           .select({ id: linkedMessages.id })
           .from(linkedMessages)
-          .where(
-            and(
-              eq(linkedMessages.id, id),
-              eq(linkedMessages.userId, auth.userId)
-            )
-          )
+          .where(and(eq(linkedMessages.id, id)))
       );
 
       const data = await db
@@ -377,10 +292,8 @@ const app = new Hono()
   )
   .delete(
     "/stop/:id",
-    clerkMiddleware(),
     zValidator("param", z.object({ id: z.string().optional() })),
     async (c) => {
-      const auth = getAuth(c);
       const { id } = c.req.valid("param");
 
       if (!id) {
@@ -392,25 +305,11 @@ const app = new Hono()
         );
       }
 
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
-        );
-      }
-
       const linkedMessagesToStop = db.$with("linked_messages_to_stop").as(
         db
           .select({ id: linkedMessages.id })
           .from(linkedMessages)
-          .where(
-            and(
-              eq(linkedMessages.id, id),
-              eq(linkedMessages.userId, auth.userId)
-            )
-          )
+          .where(and(eq(linkedMessages.id, id)))
       );
 
       const [data] = await db

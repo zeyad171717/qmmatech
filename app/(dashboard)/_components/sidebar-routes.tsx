@@ -6,6 +6,10 @@ import {
   Send,
   Bot,
   Megaphone,
+  Users,
+  UsersRound,
+  Building2,
+  KeyRound
 } from "lucide-react";
 
 import { SidebarItem } from "./sidebar-item";
@@ -17,9 +21,29 @@ const routes = [
     href: "/",
   },
   {
-    icon: Send,
-    label: "Campaign",
-    href: "/campaigns",
+    icon: Users,
+    label: "Users",
+    href: "/users",
+  },
+  {
+    icon: UsersRound,
+    label: "Teams",
+    href: "/teams",
+  },
+  {
+    icon: Building2,
+    label: "Organizations",
+    href: "/organizations",
+  },
+  {
+    icon: UsersRound,
+    label: "Roles",
+    href: "/roles",
+  },
+  {
+    icon: KeyRound,
+    label: "Permissions",
+    href: "/permissions",
   },
   {
     icon: LayoutTemplate,

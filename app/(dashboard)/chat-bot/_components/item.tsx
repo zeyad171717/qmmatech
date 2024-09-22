@@ -7,7 +7,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { useUser } from "@clerk/nextjs";
 import { useState } from "react";
 import {
   ChevronDown,
@@ -60,7 +59,6 @@ export const Item = ({
   onCreate,
   isBot = false,
 }: ItemProps) => {
-  const { user } = useUser();
   const router = useRouter();
   const [name, setName] = useState(label);
   const [open, setOpen] = useState(false);

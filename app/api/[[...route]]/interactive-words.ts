@@ -1,5 +1,5 @@
 import { db } from "@/db/drizzle";
-import { clerkMiddleware, getAuth } from "@hono/clerk-auth";
+
 import { zValidator } from "@hono/zod-validator";
 import { createId } from "@paralleldrive/cuid2";
 import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
@@ -21,20 +21,9 @@ import {
 const app = new Hono()
   .get(
     "/:nodeId",
-    clerkMiddleware(),
     zValidator("param", z.object({ nodeId: z.string() })),
     async (c) => {
-      const auth = getAuth(c);
       const { nodeId } = c.req.valid("param");
-
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
-        );
-      }
 
       const data = await db
         .select({
@@ -49,7 +38,6 @@ const app = new Hono()
         .innerJoin(messages, eq(messages.id, interactiveWords.messageId))
         .where(
           and(
-            eq(interactiveWords.userId, auth.userId),
             eq(interactiveWords.recordStatus, "created"),
             eq(interactiveWords.nodeId, nodeId)
           )
@@ -62,9 +50,7 @@ const app = new Hono()
   .get(
     "/edit/:id",
     zValidator("param", z.object({ id: z.string().optional() })),
-    clerkMiddleware(),
     async (c) => {
-      const auth = getAuth(c);
       const { id } = c.req.valid("param");
 
       if (!id) {
@@ -76,15 +62,6 @@ const app = new Hono()
         );
       }
 
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
-        );
-      }
-
       const [data] = await db
         .select({
           id: interactiveWords.id,
@@ -93,12 +70,7 @@ const app = new Hono()
           messageId: interactiveWords.messageId,
         })
         .from(interactiveWords)
-        .where(
-          and(
-            eq(interactiveWords.userId, auth.userId),
-            eq(interactiveWords.id, id)
-          )
-        );
+        .where(eq(interactiveWords.id, id));
 
       if (!data) {
         return c.json(
@@ -114,7 +86,6 @@ const app = new Hono()
   )
   .post(
     "/",
-    clerkMiddleware(),
     zValidator(
       "json",
       z.object({
@@ -125,23 +96,12 @@ const app = new Hono()
       })
     ),
     async (c) => {
-      const auth = getAuth(c);
       const values = c.req.valid("json");
-
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
-        );
-      }
 
       const [data] = await db
         .insert(interactiveWords)
         .values({
           id: createId(),
-          userId: auth.userId,
           word: values.word,
           filter: values.filter,
           messageId: values.messageId,
@@ -156,7 +116,6 @@ const app = new Hono()
   )
   .post(
     "/bulk-delete",
-    clerkMiddleware(),
     zValidator(
       "json",
       z.object({
@@ -164,17 +123,7 @@ const app = new Hono()
       })
     ),
     async (c) => {
-      const auth = getAuth(c);
       const values = c.req.valid("json");
-
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
-        );
-      }
 
       const interactiveWordsToDelete = db
         .$with("interactive_words_to_delete")
@@ -182,12 +131,7 @@ const app = new Hono()
           db
             .select({ id: interactiveWords.id })
             .from(interactiveWords)
-            .where(
-              and(
-                inArray(interactiveWords.id, values.ids),
-                eq(interactiveWords.userId, auth.userId)
-              )
-            )
+            .where(and(inArray(interactiveWords.id, values.ids)))
         );
 
       const data = await db
@@ -209,7 +153,6 @@ const app = new Hono()
   )
   .patch(
     "/:id",
-    clerkMiddleware(),
     zValidator("param", z.object({ id: z.string().optional() })),
     zValidator(
       "json",
@@ -220,7 +163,6 @@ const app = new Hono()
       })
     ),
     async (c) => {
-      const auth = getAuth(c);
       const { id } = c.req.valid("param");
       const values = c.req.valid("json");
 
@@ -233,27 +175,13 @@ const app = new Hono()
         );
       }
 
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
-        );
-      }
-
       const interactiveWordsToUpdate = db
         .$with("interactive_words_to_update")
         .as(
           db
             .select({ id: interactiveWords.id })
             .from(interactiveWords)
-            .where(
-              and(
-                eq(interactiveWords.id, id),
-                eq(interactiveWords.userId, auth.userId)
-              )
-            )
+            .where(and(eq(interactiveWords.id, id)))
         );
 
       const data = await db
@@ -288,10 +216,8 @@ const app = new Hono()
   )
   .delete(
     "/:id",
-    clerkMiddleware(),
     zValidator("param", z.object({ id: z.string().optional() })),
     async (c) => {
-      const auth = getAuth(c);
       const { id } = c.req.valid("param");
 
       if (!id) {
@@ -303,27 +229,13 @@ const app = new Hono()
         );
       }
 
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
-        );
-      }
-
       const interactiveWordsToDelete = db
         .$with("interactive_words_to_delete")
         .as(
           db
             .select({ id: interactiveWords.id })
             .from(interactiveWords)
-            .where(
-              and(
-                eq(interactiveWords.id, id),
-                eq(interactiveWords.userId, auth.userId)
-              )
-            )
+            .where(and(eq(interactiveWords.id, id)))
         );
 
       const data = await db
@@ -354,10 +266,8 @@ const app = new Hono()
   )
   .delete(
     "/stop/:id",
-    clerkMiddleware(),
     zValidator("param", z.object({ id: z.string().optional() })),
     async (c) => {
-      const auth = getAuth(c);
       const { id } = c.req.valid("param");
 
       if (!id) {
@@ -369,25 +279,11 @@ const app = new Hono()
         );
       }
 
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
-        );
-      }
-
       const interactiveWordsToStop = db.$with("interactive_words_to_stop").as(
         db
           .select({ id: interactiveWords.id })
           .from(interactiveWords)
-          .where(
-            and(
-              eq(interactiveWords.id, id),
-              eq(interactiveWords.userId, auth.userId)
-            )
-          )
+          .where(and(eq(interactiveWords.id, id)))
       );
 
       const [data] = await db

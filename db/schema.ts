@@ -13,7 +13,6 @@ import { z } from "zod";
 
 export const contacts = pgTable("contacts", {
   id: text("id").primaryKey(),
-  userId: text("user_id").notNull(),
   phone: text("phone").notNull(),
   firstName: text("first_name").notNull(),
   lastName: text("last_name").notNull(),
@@ -55,7 +54,6 @@ export const listsRelations = relations(lists, ({ one }) => ({
 
 export const campaigns = pgTable("campaigns", {
   id: text("id").primaryKey(),
-  userId: text("user_id").notNull(),
   name: text("name").notNull(),
   status: text("status").default("Running"),
   recordStatus: text("record_status").default("created"),
@@ -169,7 +167,6 @@ export const templateButtonTypesRelations = relations(
 
 export const templates = pgTable("templates", {
   id: text("id").primaryKey(),
-  userId: text("user_id").notNull(),
   name: text("name").notNull(),
   allowCategoryChange: boolean("allowCategoryChange").notNull(),
   categoryId: text("categoryId").notNull(),
@@ -210,7 +207,6 @@ export const templatesRelations = relations(templates, ({ one, many }) => ({
 
 export const messages = pgTable("messages", {
   id: text("id").primaryKey(),
-  userId: text("user_id").notNull(),
   name: text("name").notNull(),
   bodyMessage: text("bodyMessage").notNull(),
   bodyEnding: text("bodyEnding"),
@@ -233,7 +229,6 @@ export const messagesRelations = relations(messages, ({ one, many }) => ({
 
 export const errorMessages = pgTable("errorMessages", {
   id: text("id").primaryKey(),
-  userId: text("user_id").notNull(),
   name: text("name").notNull(),
   bodyMessage: text("bodyMessage").notNull(),
   bodyEnding: text("bodyEnding"),
@@ -259,7 +254,6 @@ export const errorMessagesRelations = relations(
 
 export const linkedMessages = pgTable("linkedMessages", {
   id: text("id").primaryKey(),
-  userId: text("user_id").notNull(),
   name: text("name").notNull(),
   bodyMessage: text("bodyMessage").notNull(),
   bodyEnding: text("bodyEnding"),
@@ -295,7 +289,6 @@ export const linkedMessagesRelations = relations(
 
 export const interactiveWords = pgTable("interactiveWords", {
   id: text("id").primaryKey(),
-  userId: text("user_id").notNull(),
   word: text("word").notNull(),
   filter: text("filter").notNull(),
   status: text("status").default("Pending"),
@@ -327,7 +320,6 @@ export const interactiveWordsRelations = relations(
 
 export const bots = pgTable("bots", {
   id: text("id").primaryKey(),
-  userId: text("user_id").notNull(),
   name: text("name").notNull(),
   messageId: text("messageId").notNull(),
   errorMessageId: text("errorMessageId").notNull(),
@@ -346,7 +338,6 @@ export const botsRelations = relations(bots, ({ many, one }) => ({
 
 export const nodes = pgTable("nodes", {
   id: text("id").primaryKey(),
-  userId: text("user_id").notNull(),
   name: text("name").notNull(),
   botId: text("botId").notNull(),
   messageId: text("messageId").notNull(),
@@ -377,7 +368,6 @@ export const nodesRelations = relations(nodes, ({ one, many }) => ({
 export const alerts = pgTable("alerts", {
   id: text("id").primaryKey(),
   sr: serial("sr"),
-  userId: text("user_id").notNull(),
   statusCode: text("status_code").notNull(),
   name: text("name").notNull(),
   time: text("time").notNull(),
@@ -398,7 +388,6 @@ export const alertsRelations = relations(alerts, ({ one, many }) => ({
 export const abundantCarts = pgTable("abundantCarts", {
   id: text("id").primaryKey(),
   sr: serial("sr"),
-  userId: text("user_id").notNull(),
   statusCode: text("status_code").notNull(),
   name: text("name").notNull(),
   time: text("time").notNull(),
@@ -424,7 +413,6 @@ export const abundantCartsRelations = relations(
 export const receiverGift = pgTable("receiverGift", {
   id: text("id").primaryKey(),
   sr: serial("sr"),
-  userId: text("user_id").notNull(),
   alertId: text("alertId").notNull(),
   messageAfterFirstButtonId: text("messageAfterFirstButtonId").notNull(),
   messageAfterSecondButtonId: text("messageAfterSecondButtonId").notNull(),
@@ -464,7 +452,6 @@ export const receiverGiftRelations = relations(
 export const payOnReceive = pgTable("payOnReceive", {
   id: text("id").primaryKey(),
   sr: serial("sr"),
-  userId: text("user_id").notNull(),
   alertId: text("alertId").notNull(),
   messageAfterFirstButtonId: text("messageAfterFirstButtonId").notNull(),
   messageAfterSecondButtonId: text("messageAfterSecondButtonId").notNull(),
@@ -506,7 +493,6 @@ export const payOnReceiveRelations = relations(
 export const bankTransfer = pgTable("bankTransfer", {
   id: text("id").primaryKey(),
   sr: serial("sr"),
-  userId: text("user_id").notNull(),
   alertId: text("alertId").notNull(),
   messageAfterFirstButtonId: text("messageAfterFirstButtonId").notNull(),
   messageAfterSecondButtonId: text("messageAfterSecondButtonId").notNull(),
@@ -514,7 +500,7 @@ export const bankTransfer = pgTable("bankTransfer", {
   statusErrorMessageId: text("statusErrorMessageId").notNull(),
   scheduledDays: integer("scheduledDays"),
   scheduledHours: integer("scheduledHours"),
-  scheduledMinutes: integer("scheduledMinutes"),  
+  scheduledMinutes: integer("scheduledMinutes"),
   time: text("time").notNull(),
 });
 export const bankTransferRelations = relations(
@@ -546,7 +532,6 @@ export const bankTransferRelations = relations(
 export const newLogin = pgTable("newLogin", {
   id: text("id").primaryKey(),
   sr: serial("sr"),
-  userId: text("user_id").notNull(),
   alertId: text("alertId").notNull(),
   templateId: text("templateId").notNull(),
   status: text("status").notNull(),
@@ -565,6 +550,168 @@ export const newLoginRelations = relations(newLogin, ({ one, many }) => ({
     references: [templates.id],
   }),
 }));
+
+export const permissions = pgTable("permissions", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description"),
+  recordStatus: text("recordStatus").default("created"),
+});
+export const permissionsRelations = relations(permissions, ({ many }) => ({
+  rolesToPermissions: many(rolesToPermissions),
+}));
+
+export const roles = pgTable("roles", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description"),
+  recordStatus: text("recordStatus").default("created"),
+});
+export const rolesRelations = relations(roles, ({ many }) => ({
+  rolesToPermissions: many(rolesToPermissions),
+  users: many(users),
+}));
+
+export const rolesToPermissions = pgTable(
+  "roles_to_permissions",
+  {
+    roleId: text("role_id")
+      .notNull()
+      .references(() => roles.id),
+    permissionId: text("permission_id")
+      .notNull()
+      .references(() => permissions.id),
+    status: text("status").default("active"),
+    orgId: text("orgId").notNull(),
+    recordStatus: text("recordStatus").default("created"),
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.roleId, t.permissionId] }),
+  })
+);
+export const rolesToPermissionsRelations = relations(
+  rolesToPermissions,
+  ({ one }) => ({
+    permission: one(permissions, {
+      fields: [rolesToPermissions.permissionId],
+      references: [permissions.id],
+    }),
+    role: one(roles, {
+      fields: [rolesToPermissions.roleId],
+      references: [roles.id],
+    }),
+  })
+);
+
+export const organizations = pgTable("organizations", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  country: text("country").notNull(),
+  city: text("city").notNull(),
+  phone: text("phone").notNull(),
+  recordStatus: text("recordStatus").default("created"),
+});
+
+export const users = pgTable("users", {
+  id: text("id").primaryKey(),
+  orgId: text("orgId"),
+  roleId: text("roleId")
+    .notNull()
+    .references(() => roles.id),
+  username: text("username").notNull(),
+  imgUrl: text("imgUrl"),
+  status: text("status").notNull(),
+  language: text("language").notNull(),
+  email: text("email").notNull(),
+  password: text("password").notNull(),
+  phoneNumber: text("phoneNumber").notNull(),
+  recordStatus: text("recordStatus").default("created"),
+});
+export const usersRelations = relations(users, ({ one, many }) => ({
+  role: one(roles, {
+    fields: [users.roleId],
+    references: [roles.id],
+  }),
+  teamsToUsers: many(teamsToUsers),
+  usersToChannels: many(usersToChannels),
+}));
+
+export const teams = pgTable("teams", {
+  id: text("id").primaryKey(),
+  orgId: text("orgId"),
+  name: text("name").notNull(),
+  recordStatus: text("recordStatus").default("created"),
+});
+export const teamsRelations = relations(teams, ({ many }) => ({
+  teamsToUsers: many(teamsToUsers),
+}));
+
+export const teamsToUsers = pgTable(
+  "teams_to_users",
+  {
+    teamId: text("team_id")
+      .notNull()
+      .references(() => teams.id),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id),
+    orgId: text("orgId").notNull(),
+    recordStatus: text("recordStatus").default("created"),
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.teamId, t.userId] }),
+  })
+);
+export const teamsToUsersRelations = relations(teamsToUsers, ({ one }) => ({
+  team: one(teams, {
+    fields: [teamsToUsers.teamId],
+    references: [teams.id],
+  }),
+  user: one(users, {
+    fields: [teamsToUsers.userId],
+    references: [users.id],
+  }),
+}));
+
+export const channels = pgTable("channels", {
+  id: text("id").primaryKey(),
+  orgId: text("orgId"),
+  name: text("name").notNull(),
+  recordStatus: text("recordStatus").default("created"),
+});
+export const channelsRelations = relations(channels, ({ many }) => ({
+  usersToChannels: many(usersToChannels),
+}));
+
+export const usersToChannels = pgTable(
+  "users_to_channels",
+  {
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id),
+    channelId: text("channel_id")
+      .notNull()
+      .references(() => channels.id),
+    orgId: text("orgId").notNull(),
+    recordStatus: text("recordStatus").default("created"),
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.userId, t.channelId] }),
+  })
+);
+export const usersToChannelsRelations = relations(
+  usersToChannels,
+  ({ one }) => ({
+    user: one(users, {
+      fields: [usersToChannels.userId],
+      references: [users.id],
+    }),
+    channel: one(channels, {
+      fields: [usersToChannels.channelId],
+      references: [channels.id],
+    }),
+  })
+);
 
 export const insertContactSchema = createInsertSchema(contacts);
 export const insertListSchema = createInsertSchema(lists, {

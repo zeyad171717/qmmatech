@@ -1,0 +1,1 @@
+ALTER TABLE "roles_to_permissions" ADD COLUMN "status" text DEFAULT 'active';

@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
-import { UserButton } from "@clerk/nextjs";
+import { OrganizationSwitcher } from "./organization-switcher";
 
 export const NavbarRoutes = () => {
   return (
-    <div className="flex gap-x-2 ml-auto">
-      <UserButton />
+    <div className="flex flex-row w-full justify-between items-center">
+      <OrganizationSwitcher />
     </div>
   );
 };

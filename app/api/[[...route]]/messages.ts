@@ -1,5 +1,5 @@
 import { db } from "@/db/drizzle";
-import { clerkMiddleware, getAuth } from "@hono/clerk-auth";
+
 import { zValidator } from "@hono/zod-validator";
 import { createId } from "@paralleldrive/cuid2";
 import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
@@ -18,18 +18,7 @@ import {
 } from "@/db/schema";
 
 const app = new Hono()
-  .get("/", clerkMiddleware(), async (c) => {
-    const auth = getAuth(c);
-
-    if (!auth?.userId) {
-      return c.json(
-        {
-          error: "Unauthorized",
-        },
-        401
-      );
-    }
-
+  .get("/", async (c) => {
     const data = await db
       .select({
         id: messages.id,
@@ -38,28 +27,12 @@ const app = new Hono()
         creationDate: messages.creationDate,
       })
       .from(messages)
-      .where(
-        and(
-          eq(messages.userId, auth.userId),
-          eq(messages.recordStatus, "created")
-        )
-      )
+      .where(eq(messages.recordStatus, "created"))
       .orderBy(desc(messages.creationDate));
 
     return c.json({ data });
   })
-  .get("/header-types", clerkMiddleware(), async (c) => {
-    const auth = getAuth(c);
-
-    if (!auth?.userId) {
-      return c.json(
-        {
-          error: "Unauthorized",
-        },
-        401
-      );
-    }
-
+  .get("/header-types", async (c) => {
     const data = await db
       .select({
         label: templateHeaderTypes.name,
@@ -69,18 +42,7 @@ const app = new Hono()
 
     return c.json({ data });
   })
-  .get("/button-types", clerkMiddleware(), async (c) => {
-    const auth = getAuth(c);
-
-    if (!auth?.userId) {
-      return c.json(
-        {
-          error: "Unauthorized",
-        },
-        401
-      );
-    }
-
+  .get("/button-types", async (c) => {
     const data = await db
       .select({
         label: templateButtonTypes.name,
@@ -91,18 +53,7 @@ const app = new Hono()
 
     return c.json({ data });
   })
-  .get("/archived", clerkMiddleware(), async (c) => {
-    const auth = getAuth(c);
-
-    if (!auth?.userId) {
-      return c.json(
-        {
-          error: "Unauthorized",
-        },
-        401
-      );
-    }
-
+  .get("/archived", async (c) => {
     const data = await db
       .select({
         id: messages.id,
@@ -111,12 +62,7 @@ const app = new Hono()
         creationDate: messages.creationDate,
       })
       .from(messages)
-      .where(
-        and(
-          eq(messages.userId, auth.userId),
-          eq(messages.recordStatus, "archived")
-        )
-      )
+      .where(eq(messages.recordStatus, "archived"))
       .orderBy(desc(messages.creationDate));
 
     return c.json({ data });
@@ -124,9 +70,7 @@ const app = new Hono()
   .get(
     "/:id",
     zValidator("param", z.object({ id: z.string().optional() })),
-    clerkMiddleware(),
     async (c) => {
-      const auth = getAuth(c);
       const { id } = c.req.valid("param");
 
       if (!id) {
@@ -135,15 +79,6 @@ const app = new Hono()
             error: "Missing id",
           },
           400
-        );
-      }
-
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
         );
       }
 
@@ -161,7 +96,7 @@ const app = new Hono()
           footerText: messages.footerText,
         })
         .from(messages)
-        .where(and(eq(messages.userId, auth.userId), eq(messages.id, id)));
+        .where(eq(messages.id, id));
 
       if (!data) {
         return c.json(
@@ -177,7 +112,6 @@ const app = new Hono()
   )
   .post(
     "/",
-    clerkMiddleware(),
     zValidator(
       "json",
       z.object({
@@ -192,23 +126,12 @@ const app = new Hono()
       })
     ),
     async (c) => {
-      const auth = getAuth(c);
       const values = c.req.valid("json");
-
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
-        );
-      }
 
       const [data] = await db
         .insert(messages)
         .values({
           id: createId(),
-          userId: auth.userId,
           name: values.name,
           bodyMessage: values.bodyMessage,
           bodyEnding: values.bodyEnding,
@@ -227,7 +150,6 @@ const app = new Hono()
   )
   .post(
     "/bulk-delete",
-    clerkMiddleware(),
     zValidator(
       "json",
       z.object({
@@ -235,28 +157,13 @@ const app = new Hono()
       })
     ),
     async (c) => {
-      const auth = getAuth(c);
       const values = c.req.valid("json");
-
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
-        );
-      }
 
       const templatesToDelete = db.$with("templates_to_delete").as(
         db
           .select({ id: messages.id })
           .from(messages)
-          .where(
-            and(
-              inArray(messages.id, values.ids),
-              eq(messages.userId, auth.userId)
-            )
-          )
+          .where(and(inArray(messages.id, values.ids)))
       );
 
       const data = await db
@@ -273,7 +180,6 @@ const app = new Hono()
   )
   .patch(
     "/:id",
-    clerkMiddleware(),
     zValidator("param", z.object({ id: z.string().optional() })),
     zValidator(
       "json",
@@ -289,7 +195,6 @@ const app = new Hono()
       })
     ),
     async (c) => {
-      const auth = getAuth(c);
       const { id } = c.req.valid("param");
       const values = c.req.valid("json");
 
@@ -302,20 +207,11 @@ const app = new Hono()
         );
       }
 
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
-        );
-      }
-
       const templatesToUpdate = db.$with("templates_to_update").as(
         db
           .select({ id: messages.id })
           .from(messages)
-          .where(and(eq(messages.id, id), eq(messages.userId, auth.userId)))
+          .where(and(eq(messages.id, id)))
       );
 
       const data = await db
@@ -350,10 +246,8 @@ const app = new Hono()
   )
   .delete(
     "/:id",
-    clerkMiddleware(),
     zValidator("param", z.object({ id: z.string().optional() })),
     async (c) => {
-      const auth = getAuth(c);
       const { id } = c.req.valid("param");
 
       if (!id) {
@@ -365,20 +259,11 @@ const app = new Hono()
         );
       }
 
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
-        );
-      }
-
       const templatesToDelete = db.$with("templates_to_delete").as(
         db
           .select({ id: messages.id })
           .from(messages)
-          .where(and(eq(messages.id, id), eq(messages.userId, auth.userId)))
+          .where(and(eq(messages.id, id)))
       );
 
       const data = await db
@@ -404,10 +289,8 @@ const app = new Hono()
   )
   .delete(
     "/archive/:id",
-    clerkMiddleware(),
     zValidator("param", z.object({ id: z.string().optional() })),
     async (c) => {
-      const auth = getAuth(c);
       const { id } = c.req.valid("param");
 
       if (!id) {
@@ -419,20 +302,11 @@ const app = new Hono()
         );
       }
 
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
-        );
-      }
-
       const templatesToArchive = db.$with("templates_to_archive").as(
         db
           .select({ id: messages.id })
           .from(messages)
-          .where(and(eq(messages.id, id), eq(messages.userId, auth.userId)))
+          .where(and(eq(messages.id, id)))
       );
 
       const [data] = await db
@@ -460,10 +334,8 @@ const app = new Hono()
   )
   .delete(
     "/stop/:id",
-    clerkMiddleware(),
     zValidator("param", z.object({ id: z.string().optional() })),
     async (c) => {
-      const auth = getAuth(c);
       const { id } = c.req.valid("param");
 
       if (!id) {
@@ -475,20 +347,11 @@ const app = new Hono()
         );
       }
 
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
-        );
-      }
-
       const templatesToStop = db.$with("templates_to_stop").as(
         db
           .select({ id: messages.id })
           .from(messages)
-          .where(and(eq(messages.id, id), eq(messages.userId, auth.userId)))
+          .where(and(eq(messages.id, id)))
       );
 
       const [data] = await db
@@ -514,10 +377,8 @@ const app = new Hono()
   )
   .delete(
     "/restore/:id",
-    clerkMiddleware(),
     zValidator("param", z.object({ id: z.string().optional() })),
     async (c) => {
-      const auth = getAuth(c);
       const { id } = c.req.valid("param");
 
       if (!id) {
@@ -529,20 +390,11 @@ const app = new Hono()
         );
       }
 
-      if (!auth?.userId) {
-        return c.json(
-          {
-            error: "Unauthorized",
-          },
-          401
-        );
-      }
-
       const templatesToRestore = db.$with("templates_to_restore").as(
         db
           .select({ id: messages.id })
           .from(messages)
-          .where(and(eq(messages.id, id), eq(messages.userId, auth.userId)))
+          .where(and(eq(messages.id, id)))
       );
 
       const [data] = await db
